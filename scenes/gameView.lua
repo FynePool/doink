@@ -98,7 +98,7 @@ local physics = require "physics"
 
 
 --> SOUND
-	local goalSound = audio.loadSound('sounds/goal.wav')
+	local goalSound = audio.loadSound('assets/sounds/goal.wav')
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> FUNCTIONS
@@ -388,6 +388,17 @@ local physics = require "physics"
 
 	local deltaY = {longside + b, - longside - b }
 
+	--rimuove l'oggetto e libera lo slot: senza azzerarlo resta un riferimento
+	--a un oggetto gia' distrutto, e la rimozione successiva va in errore
+	local function remove(t, n)
+		if t[n] then
+			if t[n].removeSelf then
+				t[n]:removeSelf()
+			end
+			t[n] = nil
+		end
+	end
+
 	--riporta player sulla linea di porta
 	local function goNet(player, n, SegmentTransition, playerX, playerY)
 		transition.pause(player)
@@ -408,7 +419,7 @@ local physics = require "physics"
 	local function restoreWall(n)
 		if wall[n] then
 			physics.removeBody( wall[n] )
-			wall[n]:removeSelf()
+			remove( wall, n )
 		end
 	end
 
@@ -653,23 +664,10 @@ local physics = require "physics"
 local function menuView()
 	timer.pause(powerup_start[1])
 	timer.pause(powerup_start[2])
-	if loading[1] then
-		loading[1]:removeSelf()
-	end
-	if loading[2] then
-		loading[2]:removeSelf()
-	end
-	if power_button[1] then
-		power_button[1]:removeSelf()
-	end
-	if power_button[2] then
-		power_button[2]:removeSelf()
-	end
-	if wall[1] then
-		wall[1]:removeSelf()
-	end
-	if wall[2] then
-		wall[2]:removeSelf()
+	for i = 1, 2 do
+		remove( loading, i )
+		remove( power_button, i )
+		remove( wall, i )
 	end
 	composer.gotoScene( "scenes.menuView", "fade", 300 )
 	return true
@@ -982,7 +980,7 @@ end
 	restartBtn.x = display.contentWidth*85/100
 	restartBtn.y = display.contentWidth*25/100
 
-	menuBtn=display.newImageRect('buttons/menu_round.png',  display.contentWidth*20/100, display.contentWidth*20/100)
+	menuBtn=display.newImageRect('assets/buttons/menu_round.png',  display.contentWidth*20/100, display.contentWidth*20/100)
 	menuBtn.x = display.contentWidth*15/100
 	menuBtn.y = display.contentWidth*25/100
 	menuBtn:addEventListener('tap', menuView)
@@ -1105,7 +1103,7 @@ function scene:hide( event )
 		-- Called when the scene is on screen and is about to move off screen
 		-- INSERT code here to pause the scene
 		physics.stop()
-		composer.removeScene("gameView") -- rimuove completamente la scena
+		composer.removeScene("scenes.gameView") -- rimuove completamente la scena
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 	end
