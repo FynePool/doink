@@ -84,6 +84,18 @@ Made by **Alessandro Chiabrera, Matteo Ferrini, Luca Montenero, Riccardo Rocco**
 
 The design document is included as [`Doink!.pdf`](Doink!.pdf).
 
+## License
+
+The source code is released under the [MIT License](LICENSE).
+
+This does **not** extend to every file in the repository. Third-party assets keep their own terms, and at least one is known not to be redistributable under MIT:
+
+- `fonts/BLADRMF_.TTF` — "Blade Runner Movie Font" by Phil Steinschneider. Its embedded metadata reads *"Blade Runner is a trademark of the Blade Runner Partnership. All rights reserved."* It is a fan-made font and is **not** covered by the MIT grant above.
+- [GGData.lua](GGData.lua) is third-party (Glitch Games) and carries its own license terms.
+- The provenance of the sound files in [sounds/](sounds/) has not been verified.
+
+If you reuse this project, check those separately.
+
 ## Status
 
-This is an archived 2017 project, published as-is. It is not actively maintained, and no license has been declared — all rights are reserved by default until one is added.
+This is an archived 2017 project, published as-is and no longer actively developed.
