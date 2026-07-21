@@ -1,6 +1,12 @@
 # macOS
 .DS_Store
-Icon?
+
+# Finder custom-folder-icon files. The real name is "Icon" plus a control
+# character, so a "?" glob will not match it once it has been re-encoded as a
+# multi-byte sequence. Match broadly, then keep the genuine app icons.
+Icon*
+!Icon.png
+!Icon-*.png
 
 # Build output
 *.apk
