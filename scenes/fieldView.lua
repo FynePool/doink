@@ -8,31 +8,31 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
-local global = require( "variables" )
+local global = require( "lib.variables" )
 
 --> FUNCTIONS
 local function creditsView()
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function creditsView0()
 	global.fieldType = 0
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function creditsView1()
   global.fieldType = 1
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function creditsView2()
   global.fieldType = 2
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function creditsView3()
   global.fieldType = 3
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 
@@ -41,7 +41,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -53,7 +53,7 @@ function scene:create( event )
   text.y = display.contentHeight*1/100
 
   local field0 = widget.newButton{
-  	defaultFile= "fields/field0.png",
+  	defaultFile= "assets/fields/field0.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView0
   }
@@ -61,7 +61,7 @@ function scene:create( event )
   field0.y = display.contentHeight*32/100
 
   local field1 = widget.newButton{
-  	defaultFile= "fields/field1v.png",
+  	defaultFile= "assets/fields/field1v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView1
   }
@@ -69,7 +69,7 @@ function scene:create( event )
   field1.y = display.contentHeight*32/100
 
   local field2 = widget.newButton{
-  	defaultFile= "fields/field2v.png",
+  	defaultFile= "assets/fields/field2v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView2
   }
@@ -77,7 +77,7 @@ function scene:create( event )
   field2.y = display.contentHeight*82/100
 
   local field3 = widget.newButton{
-  	defaultFile= "fields/field3v.png",
+  	defaultFile= "assets/fields/field3v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
     onRelease = creditsView3
   }
@@ -86,7 +86,7 @@ function scene:create( event )
 
   --back button
   local backBtn = widget.newButton{
-  	defaultFile= "buttons/back_round.png",
+  	defaultFile= "assets/buttons/back_round.png",
   	width = display.contentWidth*20/100, height = display.contentWidth*20/100,
   	onRelease = creditsView
   }

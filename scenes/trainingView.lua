@@ -10,7 +10,7 @@ local widget = require "widget"
 
 --> FUNCTIONS
 local function menuView()
-	composer.gotoScene( "menuView", "fade", 300 )
+	composer.gotoScene( "scenes.menuView", "fade", 300 )
 	return true
 end
 
@@ -19,13 +19,13 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "backgroundDark.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/backgroundDark.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
 --buttons
 	local backBtn = widget.newButton{
-		defaultFile= "buttons/back_round.png",
+		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView
 	}

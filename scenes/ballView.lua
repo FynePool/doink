@@ -8,35 +8,35 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
-local global = require( "variables" )
+local global = require( "lib.variables" )
 
 --> FUNCTIONS
 local function menuView()
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView0()
   global.ballType = 0
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView1()
   global.ballType = 1
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView2()
   global.ballType = 2
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView3()
   global.ballType = 3
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function ballView2()
-	composer.gotoScene( "ballView2", "crossFade", 300 )	-- event listener function
+	composer.gotoScene( "scenes.ballView2", "crossFade", 300 )	-- event listener function
   return true
 end
 
@@ -46,13 +46,13 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
 	--back button
 	local backBtn = widget.newButton{
-		defaultFile= "buttons/back_round.png",
+		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView
 	}
@@ -61,8 +61,8 @@ function scene:create( event )
 
 --balls
 local ball0 = widget.newButton{
-	defaultFile= "balls/ball0S.png",
-	overFile="balls/ball0P.png",
+	defaultFile= "assets/balls/ball0S.png",
+	overFile="assets/balls/ball0P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
 	onRelease = menuView0
 }
@@ -70,8 +70,8 @@ ball0.x = display.contentWidth*25/100
 ball0.y = display.contentHeight*35/100
 
 local ball1 = widget.newButton{
-	defaultFile= "balls/ball1S.png",
-	overFile="balls/ball1P.png",
+	defaultFile= "assets/balls/ball1S.png",
+	overFile="assets/balls/ball1P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
 	onRelease = menuView1
 }
@@ -79,8 +79,8 @@ ball1.x = display.contentWidth*75/100
 ball1.y = display.contentHeight*35/100
 
 local ball2 = widget.newButton{
-	defaultFile= "balls/ball2S.png",
-	overFile="balls/ball2P.png",
+	defaultFile= "assets/balls/ball2S.png",
+	overFile="assets/balls/ball2P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
 	onRelease = menuView2
 }
@@ -88,8 +88,8 @@ ball2.x = display.contentWidth*25/100
 ball2.y = display.contentHeight*70/100
 
 local ball3 = widget.newButton{
-	defaultFile= "balls/ball3S.png",
-	overFile="balls/ball3P.png",
+	defaultFile= "assets/balls/ball3S.png",
+	overFile="assets/balls/ball3P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
 	onRelease = menuView3
 }
@@ -98,7 +98,7 @@ ball3.y = display.contentHeight*70/100
 
 --arrow buttons
 local rightBtn = widget.newButton{
-	defaultFile= "buttons/buttonRight.png",
+	defaultFile= "assets/buttons/buttonRight.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 	onRelease = ballView2
 }
@@ -106,7 +106,7 @@ rightBtn.x = display.contentCenterX+35
 rightBtn.y = display.contentHeight
 
 local leftBtn = widget.newButton{
-	defaultFile= "buttons/buttonLeft.png",
+	defaultFile= "assets/buttons/buttonLeft.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 }
 leftBtn.x = display.contentCenterX-35

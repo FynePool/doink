@@ -9,13 +9,13 @@ local scene = composer.newScene()
 local widget = require "widget"
 
 -- include global variables custom lua
-	local global = require( "variables" )
+	local global = require( "lib.variables" )
 
 -----------------------------------------------------------------------------------------
 
 --> FUNCTIONS
 local function creditsView()
-	composer.gotoScene( "creditsView", "slideRight", 300 )	-- event listener function
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )	-- event listener function
 	return true
 end
 
@@ -26,7 +26,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -78,7 +78,7 @@ scrollView:insert( guideText01 )
 --> BUTTONS
 --back button
 local backBtn = widget.newButton{
-	defaultFile= "buttons/back_round.png",
+	defaultFile= "assets/buttons/back_round.png",
 	width = display.contentWidth*18/100, height = display.contentWidth*18/100,
 	onRelease = creditsView
 }

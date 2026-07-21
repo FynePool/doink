@@ -9,23 +9,23 @@ local scene = composer.newScene()
 local widget = require "widget"
 
 -- include global variables custom lua
-	local global = require( "variables" )
+	local global = require( "lib.variables" )
 
 -----------------------------------------------------------------------------------------
 
 --> COMPOSER FUNCTIONS
 local function menuView()
-	composer.gotoScene( "menuView", "fade", 300 )	-- event listener function
+	composer.gotoScene( "scenes.menuView", "fade", 300 )	-- event listener function
 	return true
 end
 local function guideView()
-	composer.gotoScene( "guideView", "slideLeft", 300)
+	composer.gotoScene( "scenes.guideView", "slideLeft", 300)
 end
 local function fieldView()
-	composer.gotoScene( "fieldView", "slideLeft", 300)
+	composer.gotoScene( "scenes.fieldView", "slideLeft", 300)
 end
 local function ballView()
-	composer.gotoScene( "ballView", "slideLeft", 300 )	-- event listener function
+	composer.gotoScene( "scenes.ballView", "slideLeft", 300 )	-- event listener function
 	return true
 end
 local function bug()
@@ -38,20 +38,20 @@ end
 
 function playSound()
   if ( global.soundFlag==1 ) then
-    global.sound = audio.loadSound("sounds/mainSound.wav")
+    global.sound = audio.loadSound("assets/sounds/mainSound.wav")
 		audio.play(global.sound, {loops=-1})
   elseif ( global.soundFlag==0 ) then
-    global.sound = audio.loadSound("sounds/mainSound.wav")
+    global.sound = audio.loadSound("assets/sounds/mainSound.wav")
     audio.pause(global.sound)
   end
 end
 
 function playSfx()
   if ( global.sfxFlag==1 ) then
-    --global.sound = audio.loadSound("sounds/mainSound.wav")
+    --global.sound = audio.loadSound("assets/sounds/mainSound.wav")
 		--audio.play(global.sound, {loops=-1})
   elseif ( global.fxFlag==0 ) then
-    --global.sound = audio.loadSound("sounds/mainSound.wav")
+    --global.sound = audio.loadSound("assets/sounds/mainSound.wav")
     --audio.pause(global.sound)
   end
 end
@@ -96,7 +96,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
@@ -138,7 +138,7 @@ function scene:create( event )
 			sheetContentWidth = 64,
 			sheetContentHeight = 128
 	}
-	local difficultySheet = graphics.newImageSheet( "widgets/SegmentedControlBlue.png", optionsDiff )
+	local difficultySheet = graphics.newImageSheet( "assets/widgets/SegmentedControlBlue.png", optionsDiff )
 	local difficultyControl = widget.newSegmentedControl({
 	        left = display.contentWidth*36.5/100,
 	        top = display.contentHeight*5/100,
@@ -183,7 +183,7 @@ function scene:create( event )
 	    sheetContentWidth = 184,
 	    sheetContentHeight = 88
 	}
-	local musicSwitchSheet = graphics.newImageSheet( "widgets/switchSheetSquare.png", options )
+	local musicSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
 	local musicSwitch = widget.newSwitch(
 	    {
 	        x = musicX(),
@@ -198,7 +198,7 @@ function scene:create( event )
 	        onOffBackgroundFrame = 1,
 	        onOffBackgroundWidth = 160,
 	        onOffBackgroundHeight = 44,
-	        onOffMask = "widgets/switchMaskSquare.png",
+	        onOffMask = "assets/widgets/switchMaskSquare.png",
 
 	        onOffHandleDefaultFrame = 2,
 	        onOffHandleOverFrame = 3,
@@ -233,7 +233,7 @@ function scene:create( event )
 	    sheetContentWidth = 184,
 	    sheetContentHeight = 88
 	}
-	local sfxSwitchSheet = graphics.newImageSheet( "widgets/switchSheetSquare.png", options )
+	local sfxSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
 	local sfxSwitch = widget.newSwitch(
 	    {
 					x = sfxX(),
@@ -248,7 +248,7 @@ function scene:create( event )
 	        onOffBackgroundFrame = 1,
 	        onOffBackgroundWidth = 160,
 	        onOffBackgroundHeight = 44,
-	        onOffMask = "widgets/switchMaskSquare.png",
+	        onOffMask = "assets/widgets/switchMaskSquare.png",
 
 	        onOffHandleDefaultFrame = 2,
 	        onOffHandleOverFrame = 3,
@@ -290,7 +290,7 @@ function scene:create( event )
 --buttons
 --back button
 local backBtn = widget.newButton{
-	defaultFile= "buttons/back_round.png",
+	defaultFile= "assets/buttons/back_round.png",
 	width = display.contentWidth*18/100, height = display.contentWidth*18/100,
 	onRelease = menuView
 }
@@ -299,8 +299,8 @@ backBtn.y = display.contentHeight*1/100-15
 
 --guide button
 local guideBtn = widget.newButton{
-	defaultFile= "buttons/button.png",
-	overFile= "buttons/button-over.png",
+	defaultFile= "assets/buttons/button.png",
+	overFile= "assets/buttons/button-over.png",
 	label= "Guida",
 	labelColor = { default={ 1, 1, 1 }, over={ 1, 1, 1 } },
 	width = display.contentWidth*30/100, height = display.contentWidth*15/100,
@@ -311,7 +311,7 @@ guideBtn.y = display.contentHeight*45/100
 
 --balls button
 local ballBtn = widget.newButton{
-	defaultFile= "buttons/ballView.png",
+	defaultFile= "assets/buttons/ballView.png",
 	width = display.contentWidth*30/100, height = display.contentWidth*30/100,
 	onRelease = ballView
 }
@@ -320,7 +320,7 @@ ballBtn.y = display.contentHeight*65/100
 
 --fields button
 local fieldBtn = widget.newButton{
-	defaultFile= "buttons/fieldView.png",
+	defaultFile= "assets/buttons/fieldView.png",
 	width = display.contentWidth*28.125/100, height = display.contentWidth*25/100,
 	onRelease = fieldView
 }
@@ -329,7 +329,7 @@ fieldBtn.y = display.contentHeight*65/100
 
 --bugs button
 local bugBtn = widget.newButton{
-	defaultFile= "buttons/bugBtn.png",
+	defaultFile= "assets/buttons/bugBtn.png",
 	width = display.contentWidth*90/100, height = display.contentWidth*21/100,
 	onRelease = bug
 }

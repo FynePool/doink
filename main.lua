@@ -4,9 +4,9 @@
 	system.activate( "multitouch" )
 
 -- include global variables custom lua
-	local global = require( "variables" )
+	local global = require( "lib.variables" )
 --load sound file to prevent delay when activated or disabled
-	global.sound = audio.loadSound("sounds/mainSound.wav")
+	global.sound = audio.loadSound("assets/sounds/mainSound.wav")
 --> HIDE ANDROID SYSTEM UI
 	native.setProperty( "androidSystemUiVisibility", "immersiveSticky" )
 
@@ -22,4 +22,4 @@
 	--global.playerType = 0
 
 -- load menu screen
-  composer.gotoScene( "menuView" )
+  composer.gotoScene( "scenes.menuView" )

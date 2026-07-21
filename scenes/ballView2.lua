@@ -8,25 +8,25 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
-local global = require( "variables" )
+local global = require( "lib.variables" )
 
 --> FUNCTIONS
 local function menuView()
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView4()
   global.ballType = 4
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function menuView5()
   global.ballType = 5
-	composer.gotoScene( "creditsView", "slideRight", 300 )
+	composer.gotoScene( "scenes.creditsView", "slideRight", 300 )
   return true
 end
 local function ballView1()
-  composer.gotoScene( "ballView", "crossFade", 300 )	-- event listener function
+  composer.gotoScene( "scenes.ballView", "crossFade", 300 )	-- event listener function
   return true
 end
 
@@ -36,13 +36,13 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
 	--back button
 	local backBtn = widget.newButton{
-		defaultFile= "buttons/back_round.png",
+		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView
 	}
@@ -51,8 +51,8 @@ function scene:create( event )
 
 --balls
 local ball4 = widget.newButton{
-  defaultFile= "balls/ball4S.png",
-  overFile="balls/ball4P.png",
+  defaultFile= "assets/balls/ball4S.png",
+  overFile="assets/balls/ball4P.png",
   width = display.contentWidth*40/100, height = display.contentWidth*40/100,
   onRelease = menuView4
  }
@@ -60,8 +60,8 @@ local ball4 = widget.newButton{
  ball4.y = display.contentHeight*35/100
 
  local ball5 = widget.newButton{
-    defaultFile= "balls/ball5S.png",
-    overFile="balls/ball5P.png",
+    defaultFile= "assets/balls/ball5S.png",
+    overFile="assets/balls/ball5P.png",
     width = display.contentWidth*40/100, height = display.contentWidth*40/100,
     onRelease = menuView5
   }
@@ -70,14 +70,14 @@ local ball4 = widget.newButton{
 
 --arrow buttons
 local rightBtn = widget.newButton{
-	defaultFile= "buttons/buttonRight.png",
+	defaultFile= "assets/buttons/buttonRight.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 }
 rightBtn.x = display.contentCenterX+35
 rightBtn.y = display.contentHeight
 
 local leftBtn = widget.newButton{
-	defaultFile= "buttons/buttonLeft.png",
+	defaultFile= "assets/buttons/buttonLeft.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 	onRelease = ballView1
 }

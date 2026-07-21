@@ -14,7 +14,7 @@ system.activate( "multitouch" )
 local widget = require "widget"
 
 -- include global variables custom lua
-local global = require( "variables" )
+local global = require( "lib.variables" )
 
 -- include Corona's "physics" library
 local physics = require "physics"
@@ -420,13 +420,13 @@ local physics = require "physics"
 			print ("X")
 			if current[n]==1 then
 				print ("a")
-				powerup_sound[n] = audio.loadSound( "sounds/powerup1_sound.wav")
+				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup1_sound.wav")
 				audio.play(powerup1_sound, {channel=6})
 				ball.isAwake=false
 			elseif current[n]==2 then
 				print ("b")
 				if not wall[n] then
-					powerup_sound[n] = audio.loadSound( "sounds/powerup2_sound.wav" )
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup2_sound.wav" )
 					audio.play(powerup2_sound, {channel=6})
 					if player==player1 and player.y>=display.contentCenterY+longside then
 						wall[n]=display.newRect( display.contentCenterX, display.contentCenterY+longside, 100, 5 )
@@ -450,27 +450,27 @@ local physics = require "physics"
 						restoreWall(n);
 					end)
 				else
-					powerup_sound[n] = audio.loadSound( "sounds/powerup4a_sound.wav" )
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
 					audio.play(powerup_sound[n], {channel=6})
 				end
 			elseif current[n]==3 then
 				print ("c")
-				powerup_sound[n] = audio.loadSound( "sounds/powerup3_sound.wav" )
+				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup3_sound.wav" )
 				audio.play(powerup_sound[n], {channel=6})
 				shootPowerDefault=shootPowerDefault*2
 				timer.performWithDelay(4000, restorePower)
 			elseif current[n]==4 then
 				print ("d")
 				if playerInPitch[n] then
-					powerup_sound[n] = audio.loadSound( "sounds/powerup4_sound.wav" )
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4_sound.wav" )
 					audio.play(powerup_sound[n], {channel=6})
 					goNet(player, n, SegmentTransition, playerX, playerY)
 				else
-					powerup_sound[n] = audio.loadSound( "sounds/powerup4a_sound.wav" )
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
 					audio.play(powerup_sound[n], {channel=6})
 				end
 			elseif current[n]==5 then
-				powerup_sound[n] = audio.loadSound( "sounds/powerup4a_sound.wav" )
+				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
 				audio.play(powerup_sound[n], {channel=6})
 			end
 			print ("Y")
@@ -487,23 +487,23 @@ local physics = require "physics"
 			print("A libero B libero")
 			rand[n]=math.random(5)
 			if rand[n]==1 then
-				loading[n]=display.newImageRect("powerups/powerup1.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==2 then
-				loading[n]=display.newImageRect("powerups/powerup2.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
 				loading[n].alpha=1
 				print("B2")
 			elseif rand[n]==3 then
-				loading[n]=display.newImageRect("powerups/powerup3.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
 				loading[n].alpha=1
 				print("B3")
 			elseif rand[n]==4 then
-				loading[n]=display.newImageRect("powerups/powerup4.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
 				loading[n].alpha=1
 				print("B4")
 			elseif rand[n]==5 then
-				loading[n]=display.newImageRect("powerups/powerup5.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
 				loading[n].alpha=1
 				print("B5")
 			end
@@ -523,15 +523,15 @@ local physics = require "physics"
 			else
 				print("counter=5")
 				if rand[n]==1 then
-					power_button[n]=display.newImageRect("powerups/powerup1.png", 30, 30 )
+					power_button[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
 				elseif rand[n]==2 then
-					power_button[n]=display.newImageRect("powerups/powerup2.png", 30, 30 )
+					power_button[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
 				elseif rand[n]==3 then
-					power_button[n]=display.newImageRect("powerups/powerup3.png", 30, 30 )
+					power_button[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
 				elseif rand[n]==4 then
-					power_button[n]=display.newImageRect("powerups/powerup4.png", 30, 30 )
+					power_button[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
 				elseif rand[n]==5 then
-					power_button[n]=display.newImageRect("powerups/powerup5.png", 30, 30 )
+					power_button[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
 				end
 				if n==2 then
 					power_button[n].x = display.contentCenterX + 78
@@ -556,23 +556,23 @@ local physics = require "physics"
 			loading[n].alpha=0
 			rand[n]=math.random(5)
 			if rand[n]==1 then
-				loading[n]=display.newImageRect("powerups/powerup1.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==2 then
-				loading[n]=display.newImageRect("powerups/powerup2.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==3 then
-				loading[n]=display.newImageRect("powerups/powerup3.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==4 then
-				loading[n]=display.newImageRect("powerups/powerup4.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==5 then
-				loading[n]=display.newImageRect("powerups/powerup5.png", 30, 30 )
+				loading[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
 				loading[n].alpha=1
 				print("B1")
 			end
@@ -603,15 +603,15 @@ local physics = require "physics"
 			power_button[n].alpha=0
 			rand[n] = staging_powerup[n]
 			if rand[n]==1 then
-				power_button[n]=display.newImageRect("powerups/powerup1.png", 30, 30 )
+				power_button[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
 			elseif rand[n]==2 then
-				power_button[n]=display.newImageRect("powerups/powerup2.png", 30, 30 )
+				power_button[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
 			elseif rand[n]==3 then
-				power_button[n]=display.newImageRect("powerups/powerup3.png", 30, 30 )
+				power_button[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
 			elseif rand[n]==4 then
-				power_button[n]=display.newImageRect("powerups/powerup4.png", 30, 30 )
+				power_button[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
 			elseif rand[n]==5 then
-				power_button[n]=display.newImageRect("powerups/powerup5.png", 30, 30 )
+				power_button[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
 			end
 			if n==2 then
 			 power_button[n].x = display.contentCenterX + 78
@@ -671,7 +671,7 @@ local function menuView()
 	if wall[2] then
 		wall[2]:removeSelf()
 	end
-	composer.gotoScene( "menuView", "fade", 300 )
+	composer.gotoScene( "scenes.menuView", "fade", 300 )
 	return true
 end
 
@@ -680,29 +680,29 @@ end
 
 	--> BACKGROUND
 	if (global.fieldType==1) then
-		background = display.newImageRect( "fields/field1.png", display.contentWidth, display.contentHeight*119/100 )
+		background = display.newImageRect( "assets/fields/field1.png", display.contentWidth, display.contentHeight*119/100 )
 		background.x = display.contentCenterX
 		background.y = display.contentCenterY
 	elseif (global.fieldType==2) then
-		background = display.newImageRect( "fields/field2.png", display.contentWidth, display.contentHeight*119/100 )
+		background = display.newImageRect( "assets/fields/field2.png", display.contentWidth, display.contentHeight*119/100 )
 		background.x = display.contentCenterX
 		background.y = display.contentCenterY
 	elseif (global.fieldType==3) then
-		background = display.newImageRect( "fields/field3.png", display.contentWidth, display.contentHeight*119/100 )
+		background = display.newImageRect( "assets/fields/field3.png", display.contentWidth, display.contentHeight*119/100 )
 		background.x = display.contentCenterX
 		background.y = display.contentCenterY
 	else
-		background = display.newImageRect( "fields/field0.png", display.contentWidth, display.contentHeight*119/100 )
+		background = display.newImageRect( "assets/fields/field0.png", display.contentWidth, display.contentHeight*119/100 )
 		background.x = display.contentCenterX
 		background.y = display.contentCenterY
 	end
 
 	--> GOALS
 	if (global.fieldType==0) then
-		porta1 = display.newImageRect("fields/porta100.png", 80, 80)
+		porta1 = display.newImageRect("assets/fields/porta100.png", 80, 80)
 		porta1.x = display.contentCenterX
 		porta1.y = display.contentHeight*3.6/100
-		porta2 = display.newImageRect("fields/porta200.png", 80, 80)
+		porta2 = display.newImageRect("assets/fields/porta200.png", 80, 80)
 		porta2.x = display.contentCenterX
 		porta2.y = display.contentHeight*96.4/100
 	end
@@ -917,27 +917,27 @@ end
 --> BALL
 
 if(global.ballType==1) then
-	ball = display.newImageRect( "balls/ball1.png", ballDim, ballDim)
+	ball = display.newImageRect( "assets/balls/ball1.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
 	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==2) then
-	ball = display.newImageRect( "balls/ball2.png", ballDim, ballDim)
+	ball = display.newImageRect( "assets/balls/ball2.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
 	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==3) then
-	ball = display.newImageRect( "balls/ball3.png", ballDim, ballDim)
+	ball = display.newImageRect( "assets/balls/ball3.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
 	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==4) then
-	ball = display.newImageRect( "balls/ball4.png", ballDim, ballDim)
+	ball = display.newImageRect( "assets/balls/ball4.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
 	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==5) then
-	ball = display.newImageRect( "balls/ball5.png", ballDim, ballDim)
+	ball = display.newImageRect( "assets/balls/ball5.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
 	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
@@ -962,23 +962,23 @@ end
 
 --> BUTTONS
 
-	button1 = display.newImageRect( "buttons/bottone2_prova.png", 180, 180  )
+	button1 = display.newImageRect( "assets/buttons/bottone2_prova.png", 180, 180  )
 	button1.x = display.contentWidth*10/100
 	button1.y = display.contentHeight*102/100
 
-	button2 = display.newImageRect( "buttons/bottone1_prova.png", 180, 180  )
+	button2 = display.newImageRect( "assets/buttons/bottone1_prova.png", 180, 180  )
 	button2.x = display.contentWidth*90/100
 	button2.y = display.contentHeight*102/100
 
-	button3 = display.newImageRect( "buttons/bottone2_prova.png", 180, 180  )
+	button3 = display.newImageRect( "assets/buttons/bottone2_prova.png", 180, 180  )
 	button3.x = display.contentWidth*90/100
 	button3.y = display.contentHeight*-2/100
 
-	button4 = display.newImageRect( "buttons/bottone1_prova.png", 180, 180  )
+	button4 = display.newImageRect( "assets/buttons/bottone1_prova.png", 180, 180  )
 	button4.x = display.contentWidth*10/100
 	button4.y = display.contentHeight*-2/100
 
-	restartBtn = display.newImageRect( "buttons/restart_round.png", display.contentWidth*20/100, display.contentWidth*20/100)
+	restartBtn = display.newImageRect( "assets/buttons/restart_round.png", display.contentWidth*20/100, display.contentWidth*20/100)
 	restartBtn.x = display.contentWidth*85/100
 	restartBtn.y = display.contentWidth*25/100
 
@@ -1003,7 +1003,7 @@ end
 	local function check()
 		if(flag==1) then
 			if(ball.y > display.contentHeight) then
-				goal = display.newImageRect("goal/goalDown.png", display.contentWidth, display.contentHeight)
+				goal = display.newImageRect("assets/goal/goalDown.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
 				if (global.soundFlag==1) then
@@ -1017,7 +1017,7 @@ end
 	      score = score+1
 	      return score
 	    elseif(ball.y < -5) then
-				goal = display.newImageRect("goal/goalUp.png", display.contentWidth, display.contentHeight)
+				goal = display.newImageRect("assets/goal/goalUp.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
 				if (global.soundFlag==1) then

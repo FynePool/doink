@@ -8,21 +8,21 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
-	local global = require( "variables" )
+	local global = require( "lib.variables" )
 
 -----------------------------------------------------------------------------------------
 
 --> FUNCTIONS
 local function creditsView()
-	composer.gotoScene( "creditsView", "fade", 300 )	-- event listener function
+	composer.gotoScene( "scenes.creditsView", "fade", 300 )	-- event listener function
 	return true
 end
 local function gameView()
-	composer.gotoScene( "gameView", "fade", 300 )
+	composer.gotoScene( "scenes.gameView", "fade", 300 )
 	return true
 end
 local function trainingView()
-	composer.gotoScene( "trainingView", "fade", 300)
+	composer.gotoScene( "scenes.trainingView", "fade", 300)
 end
 
 -----------------------------------------------------------------------------------------
@@ -32,14 +32,14 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "backgroundDark.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/backgroundDark.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
 --play button (avvia il game)
 	local playBtn = widget.newButton{
-		defaultFile="buttons/playBtn.png",
-		overFile="buttons/playBtnPressed.png",
+		defaultFile="assets/buttons/playBtn.png",
+		overFile="assets/buttons/playBtnPressed.png",
 		width= display.contentWidth*67.5/100,
 		height= display.contentHeight*16.5/100,
 		onRelease = gameView
@@ -49,8 +49,8 @@ function scene:create( event )
 
 	--training button
 	local trnBtn = widget.newButton{
-		defaultFile="buttons/trnBtn.png",
-		overFile="buttons/trnBtnPressed.png",
+		defaultFile="assets/buttons/trnBtn.png",
+		overFile="assets/buttons/trnBtnPressed.png",
 		width= display.contentWidth*67.5/100,
 		height= display.contentHeight*16.5/100,
 		onRelease = trainingView
@@ -60,8 +60,8 @@ function scene:create( event )
 
 --credits button
 	local crdBtn = widget.newButton{
-		defaultFile="buttons/settings.png",
-		overFile="buttons/settingsPressed.png",
+		defaultFile="assets/buttons/settings.png",
+		overFile="assets/buttons/settingsPressed.png",
 		width=35, height=35,
 		onRelease = creditsView
 	}
