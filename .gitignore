@@ -16,4 +16,3 @@ build/
 
 # Local Claude Code settings (machine-specific paths, not for a public repo)
 .claude/settings.local.json
-docs/newDoink
