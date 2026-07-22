@@ -6,7 +6,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 --dichiarati qui e non dentro create: scene:destroy deve poterli vedere
-local backBtn, field0, field1, field2, field3
+local backBtn, field0, field1, field2, field3, text
 
 -- include Corona's "widget" library
 local widget = require "widget"
@@ -44,12 +44,12 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/backgroundNuovo.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
   --text
-  local text = display.newText('Pick your field',display.contentCenterX,display.contentCenterY)
+  text = display.newText('Pick your field',display.contentCenterX,display.contentCenterY)
 	text:setFillColor( 0, 0, 0 )
   text.size = 32
 	text.x = display.contentWidth*55/100
@@ -118,6 +118,8 @@ end
 ]]
 function scene:destroy( event )
 	local sceneGroup = self.view
+	text:removeSelf()
+	text=nil
 	backBtn:removeSelf()	-- widgets must be manually removed
 	backBtn = nil
 	field0:removeSelf()	-- widgets must be manually removed

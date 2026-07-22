@@ -2,9 +2,9 @@
 
 A local two-player arcade football game for mobile, built with the Corona SDK (now [Solar2D](https://solar2d.com/)) in Lua.
 
-Two players share one device in portrait orientation, sitting at opposite ends of the screen. Each defends the goal on their side and tries to out-score the other.
+Two players share one device in portrait orientation, sitting at opposite ends of the screen. Each defends the goal on their side. **First to five goals wins.**
 
-The in-game guide describes a match timer, but none was ever implemented: a match runs until the players stop.
+The in-game guide still describes a match timer instead; no timer was ever implemented.
 
 ## Gameplay
 
@@ -29,10 +29,12 @@ Each player has two power-up slots shown at mid-field on their own side: the one
 
 ### Modes and settings
 
-- **Match** — the two-player game described above.
-- **Training** — intended for solo practice. **Currently a stub**: [trainingView.lua](scenes/trainingView.lua) only renders the background and a back button, with no gameplay wired up.
-- **Settings** ([creditsView.lua](scenes/creditsView.lua)) — difficulty, music and SFX toggles. Difficulty scales how fast the players slide along the border, which is what makes aiming harder: Easy 0.75×, Normal 1×, Hard 1.3×. Settings apply immediately but are not persisted.
-- **Customization** — selectable ball and pitch skins ([ballView.lua](scenes/ballView.lua), [fieldView.lua](scenes/fieldView.lua)), with assets in [balls/](assets/balls/) and [fields/](assets/fields/).
+Both modes run inside [gameView.lua](scenes/gameView.lua), switched by `global.gameMode`:
+
+- **Match** (`gameMode = 1`) — the two-player game described above, with a pause overlay and an end-of-match popup.
+- **Training** (`gameMode = 2`) — solo practice: targets spawn on the pitch in waves of three, with a cheer when you hit one. **Implemented but currently unreachable** — the menu button that sets `gameMode = 2` is commented out in [menuView.lua](scenes/menuView.lua), so there is no way into it from the UI.
+- **Settings** ([creditsView.lua](scenes/creditsView.lua)) — music and SFX toggles. The difficulty selector is commented out and `global.difficulty` is not read anywhere, so difficulty currently has no effect. Settings apply immediately but are not persisted.
+- **Customization** — selectable ball and pitch skins ([ballView.lua](scenes/ballView.lua), [fieldView.lua](scenes/fieldView.lua)), with assets in [balls/](assets/balls/) and [fields/](assets/fields/). The pitch choice also drives the UI theme: power-up icons and the menu, restart and back buttons come in neon, black and white variants selected from `global.fieldType`.
 
 An in-game guide with the full rules is in [guideView.lua](scenes/guideView.lua) (text in Italian).
 
@@ -45,7 +47,8 @@ An in-game guide with the full rules is in [guideView.lua](scenes/guideView.lua)
 - **Curved borders**: players follow the rounded pitch outline through an ellipse equation (`EllipseY`) plus timed `transition.to` segments, rather than physics-driven movement.
 - **Content area**: 320×480, `letterbox` scaling, 60 fps, portrait only.
 - **Input**: multitouch, so both players can press their buttons at the same time.
-- **Persistence**: none at runtime. [GGData.lua](lib/GGData.lua), a third-party save/load helper, is bundled but never required by any scene — settings do not survive a restart.
+- **Persistence**: none. Settings live in a shared table in memory and do not survive a restart.
+- **Audio**: music is streamed with `audio.loadStream`; effects are short MP3s gated on the SFX switch.
 
 ## Project layout
 
@@ -58,22 +61,21 @@ LaunchScreen.storyboardc  and the iOS bundle reference them by bare filename)
 
 scenes/
   menuView.lua            main menu
-  gameView.lua            the match: pitch, physics, players, power-ups, scoring
-  trainingView.lua        training mode (stub)
+  gameView.lua            match and training: pitch, physics, players,
+                          power-ups, scoring, pause and end-of-match popup
   guideView.lua           scrollable how-to-play text
   creditsView.lua         settings and credits
-  ballView.lua            ball selection  (ballView2.lua is an unused variant)
+  ballView.lua            ball selection, page 1 (ballView2.lua is page 2)
   fieldView.lua           pitch selection
 
 lib/
   variables.lua           shared global table passed between scenes
-  GGData.lua              third-party save/load helper (currently unused)
 
 assets/
-  balls/ fields/ goal/ powerups/   gameplay art
+  balls/ fields/ goal/ powerups/   gameplay art (power-ups in B/N/W themes)
   buttons/ widgets/ images/        UI art and backgrounds
-  fonts/                           bundled font (unused — see License)
-  sounds/                          music and sound effects
+  training/                        training-mode targets
+  sounds/                          music and sound effects, all MP3
 
 docs/
   Doink!.pdf              design document
@@ -105,14 +107,15 @@ The design document is included as [`docs/Doink!.pdf`](docs/Doink!.pdf).
 
 The source code is released under the [MIT License](LICENSE).
 
-This does **not** extend to every file in the repository. Third-party assets keep their own terms, and at least one is known not to be redistributable under MIT:
+This does **not** extend to every file in the repository. The provenance of the
+sound files in [sounds/](assets/sounds/) has not been verified, so check those
+separately if you reuse the project.
 
-- `assets/fonts/BLADRMF_.TTF` — "Blade Runner Movie Font" by Phil Steinschneider. Its embedded metadata reads *"Blade Runner is a trademark of the Blade Runner Partnership. All rights reserved."* It is a fan-made font and is **not** covered by the MIT grant above. No code loads it, so it can be deleted without affecting the game.
-- [GGData.lua](lib/GGData.lua) is third-party (Glitch Games) and carries its own license terms.
-- The provenance of the sound files in [sounds/](assets/sounds/) has not been verified.
-
-If you reuse this project, check those separately.
+Two third-party items that used to carry their own terms — a Blade Runner fan
+font and the GGData save helper — were unused and have been removed.
 
 ## Status
 
-This is an archived 2017 project, published as-is and no longer actively developed.
+Started in 2017, with a substantial round of work in 2021 that added training
+mode, the themed UI, the pause overlay and the five-goal win condition. Published
+as-is; not actively developed.

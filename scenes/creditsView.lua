@@ -6,7 +6,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 --dichiarati qui e non dentro create: scene:destroy deve poterli vedere
-local backBtn, ballBtn, bugBtn, difficultyControl, fieldBtn, guideBtn, musicSwitch, sfxSwitch
+local backBtn, ballBtn, bugBtn, fieldBtn, guideBtn, musicSwitch, sfxSwitch
 
 -- include Corona's "widget" library
 local widget = require "widget"
@@ -98,12 +98,14 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/backgroundSettingsNuovo.jpg", 320, 569 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
 -----------------------------------------------------------------------------------------
 --SEGMENT CONTROL
+
+--[[
 
 --DifficultyControl
 	local function onSegmentPress( event )
@@ -142,7 +144,7 @@ function scene:create( event )
 	}
 	local difficultySheet = graphics.newImageSheet( "assets/widgets/SegmentedControlBlue.png", optionsDiff )
 	difficultyControl = widget.newSegmentedControl({
-	        left = display.contentWidth*36.5/100,
+	        left = display.contentWidth*39/100,
 	        top = display.contentHeight*5/100,
 	        segmentWidth = 60,
 	        segments = { "Easy", "Normal", "Hard" },
@@ -160,6 +162,7 @@ function scene:create( event )
 	        segmentFrameHeight = 40,
 	        onPress = onSegmentPress
 	    })
+			]]
 
 -----------------------------------------------------------------------------------------
 --SWITCHES
@@ -188,8 +191,8 @@ function scene:create( event )
 	local musicSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
 	musicSwitch = widget.newSwitch(
 	    {
-	        x = musicX(),
-	        y = display.contentHeight*28/100,
+	        x = musicX() + display.contentWidth*20/100,
+	        y = display.contentHeight*8/100,
 					initialSwitchState = musicState(),
 	        style = "onOff",
 	        id = "music",
@@ -218,9 +221,9 @@ function scene:create( event )
 	    local switch = event.target
 	    print( "Switch '"..switch.id.."' is on: "..tostring(switch.isOn) )
 			if ( global.sfxFlag == 0) then
-				global.sfxFlag = 1
+				global.sfxFlag=1
 			else
-				global.sfxFlag = 0
+				global.sfxFlag=0
 			end
 			print("Sfx: ", global.sfxFlag)
 	end
@@ -234,11 +237,12 @@ function scene:create( event )
 	    sheetContentWidth = 184,
 	    sheetContentHeight = 88
 	}
+
 	local sfxSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
 	sfxSwitch = widget.newSwitch(
 	    {
-					x = sfxX(),
-	        y = display.contentHeight*28/100,
+					x = musicX() + display.contentWidth*20/100,
+	        y = display.contentHeight*19/100,
 					initialSwitchState = sfxState(),
 	        style = "onOff",
 	        id = "sfx",
@@ -266,7 +270,7 @@ function scene:create( event )
 --> SLIDERS
 -----------------------------------------------------------------------------------------
 -->TEXTS
-
+--[[
 --difficulty
 	local textDiff = display.newText('Difficulty:', display.contentWidth*17/100, display.contentHeight*8.8/100)
 	textDiff:setFillColor( 0, 0, 0 )
@@ -283,15 +287,15 @@ function scene:create( event )
 	textSfx.size = 20
 
 --credits
-	local textCrd = display.newText('App a cura di:\nAlessandro Chiabrera, Matteo Ferrini\nLuca Montenero, Riccardo Rocco', display.contentCenterX, display.contentHeight*99/100)
+	local textCrd = display.newText('Developed by qwerteam:\nAlessandro Chiabrera, Matteo Ferrini\nLuca Montenero, Riccardo Rocco', display.contentCenterX, display.contentHeight*99/100)
 	textCrd:setFillColor( 0, 0, 0 )
 	textCrd.size = 18
-
+]]
 -----------------------------------------------------------------------------------------
 --buttons
 --back button
 backBtn = widget.newButton{
-	defaultFile= "assets/buttons/back_round.png",
+	defaultFile= "assets/buttons/back_roundW.png",
 	width = display.contentWidth*18/100, height = display.contentWidth*18/100,
 	onRelease = menuView
 }
@@ -300,51 +304,50 @@ backBtn.y = display.contentHeight*1/100-15
 
 --guide button
 guideBtn = widget.newButton{
-	defaultFile= "assets/buttons/button.png",
-	overFile= "assets/buttons/button-over.png",
-	label= "Guida",
-	labelColor = { default={ 1, 1, 1 }, over={ 1, 1, 1 } },
-	width = display.contentWidth*30/100, height = display.contentWidth*15/100,
+	defaultFile= "assets/buttons/guide.png",
+	--label= "Guida",
+	--labelColor = { default={ 1, 1, 1 }, over={ 1, 1, 1 } },
+	width = display.contentWidth*32/100, height = display.contentWidth*25/100,
 	onRelease = guideView
 }
 guideBtn.x = display.contentCenterX
-guideBtn.y = display.contentHeight*45/100
+guideBtn.y = display.contentHeight*60/100
 
 --balls button
 ballBtn = widget.newButton{
 	defaultFile= "assets/buttons/ballView.png",
-	width = display.contentWidth*30/100, height = display.contentWidth*30/100,
+	width = display.contentWidth*25/100, height = display.contentWidth*25/100,
 	onRelease = ballView
 }
 ballBtn.x = display.contentCenterX-65
-ballBtn.y = display.contentHeight*65/100
+ballBtn.y = display.contentHeight*41/100
 
 --fields button
 fieldBtn = widget.newButton{
 	defaultFile= "assets/buttons/fieldView.png",
-	width = display.contentWidth*28.125/100, height = display.contentWidth*25/100,
+	width = display.contentWidth*25/100, height = display.contentWidth*20/100,
 	onRelease = fieldView
 }
 fieldBtn.x = display.contentCenterX+65
-fieldBtn.y = display.contentHeight*65/100
+fieldBtn.y = display.contentHeight*41/100
 
 --bugs button
 bugBtn = widget.newButton{
-	defaultFile= "assets/buttons/bugBtn.png",
-	width = display.contentWidth*90/100, height = display.contentWidth*21/100,
+	defaultFile="assets/buttons/transparent.png",
+	width = display.contentWidth*40/100, height = display.contentWidth*35/100,
 	onRelease = bug
 }
-bugBtn.x = display.contentCenterX-1
-bugBtn.y = display.contentHeight*83/100
+bugBtn.x = display.contentCenterX*60/100
+bugBtn.y = display.contentHeight*80/100
 
 -----------------------------------------------------------------------------------------
 
 -- all display objects must be inserted into group
 	sceneGroup:insert( background )
-	sceneGroup:insert( textCrd )
-	sceneGroup:insert( textMusic )
-	sceneGroup:insert( textSfx )
-	sceneGroup:insert( textDiff )
+	--sceneGroup:insert( textCrd )
+	--sceneGroup:insert( textMusic )
+	--sceneGroup:insert( textSfx )
+	--sceneGroup:insert( textDiff )
 	sceneGroup:insert( backBtn )
 	sceneGroup:insert( guideBtn )
 	sceneGroup:insert( ballBtn )
@@ -352,38 +355,29 @@ bugBtn.y = display.contentHeight*83/100
 	sceneGroup:insert( bugBtn )
 	sceneGroup:insert( musicSwitch )
 	sceneGroup:insert( sfxSwitch )
-	sceneGroup:insert( difficultyControl )
+	--sceneGroup:insert( difficultyControl )
 end
 
 ---------------------------------------------------------------------------------
 
-function scene:destroy( event )
-	display.remove(textCrd)
-	display.remove(textDiff)
-	display.remove(textMusic)
-	display.remove(textSfx)
-	display.remove(backBtn)
-	display.remove(guideBtn)
-	display.remove(background)
-	display.remove(bugBtn)
-	musicSwitch:removeSelf()	-- widgets must be manually removed
-	musicSwitch = nil
-	sfxSwitch:removeSelf()	-- widgets must be manually removed
-	sfxSwitch = nil
-	difficultyControl:removeSelf()	-- widgets must be manually removed
-	difficultyControl = nil
-	backBtn:removeSelf()	-- widgets must be manually removed
-	backBtn = nil
-	guideBtn:removeSelf()
-	guideBtn = nil
-	ballBtn:removeSelf()	-- widgets must be manually removed
-	ballBtn = nil
-	fieldBtn:removeSelf()
-	fieldBtn = nil
-	bugBtn:removeSelf()
-	bugBtn = nil
+--rimuove una sola volta e libera il riferimento: l'originale chiamava prima
+--display.remove e poi :removeSelf() sullo stesso oggetto, e la seconda
+--chiamata trovava un oggetto gia' distrutto
+local function remove(o)
+	if o and o.removeSelf then
+		o:removeSelf()
+	end
+end
 
+function scene:destroy( event )
 	local sceneGroup = self.view
+	remove(musicSwitch);  musicSwitch = nil
+	remove(sfxSwitch);    sfxSwitch = nil
+	remove(backBtn);      backBtn = nil
+	remove(guideBtn);     guideBtn = nil
+	remove(ballBtn);      ballBtn = nil
+	remove(fieldBtn);     fieldBtn = nil
+	remove(bugBtn);       bugBtn = nil
 end
 
 ---------------------------------------------------------------------------------

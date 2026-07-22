@@ -6,7 +6,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 --dichiarati qui e non dentro create: scene:destroy deve poterli vedere
-local backBtn, ball0, ball1, ball2, ball3, leftBtn, rightBtn
+local backBtn, ball0, ball1, ball2, ball3, leftBtn, rightBtn, text
 
 -- include Corona's "widget" library
 local widget = require "widget"
@@ -49,9 +49,16 @@ function scene:create( event )
 	local sceneGroup = self.view
 
 --background
-	local background = display.newImageRect( "assets/images/background.jpg", display.contentWidth, display.contentHeight*150/100 )
+	local background = display.newImageRect( "assets/images/backgroundNuovo.jpg", display.contentWidth, display.contentHeight*150/100 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
+
+--text
+	text = display.newText('Pick your ball',display.contentCenterX,display.contentCenterY)
+	text:setFillColor( 0, 0, 0 )
+	text.size = 32
+	text.x = display.contentWidth*55/100
+	text.y = display.contentHeight*1/100
 
 	--back button
 	backBtn = widget.newButton{
@@ -117,6 +124,7 @@ leftBtn.y = display.contentHeight
 
 -- all display objects must be inserted into group
 	sceneGroup:insert( background )
+	sceneGroup:insert( text )
 	sceneGroup:insert( backBtn )
 	sceneGroup:insert( rightBtn )
 	sceneGroup:insert( leftBtn )
@@ -128,6 +136,8 @@ end
 
 function scene:destroy( event )
 	local sceneGroup = self.view
+	text:removeSelf()
+	text = nil
 	backBtn:removeSelf()	-- widgets must be manually removed
 	backBtn = nil
 	rightBtn:removeSelf()	-- widgets must be manually removed

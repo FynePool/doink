@@ -6,8 +6,6 @@
 -- include global variables custom lua
 	local global = require( "lib.variables" )
 --load sound file to prevent delay when activated or disabled
---loadStream e non loadSound: il brano dura oltre 4 minuti e loadSound lo
---terrebbe interamente decompresso in memoria
 	global.sound = audio.loadStream("assets/sounds/mainSound.mp3")
 --> HIDE ANDROID SYSTEM UI
 	native.setProperty( "androidSystemUiVisibility", "immersiveSticky" )
@@ -22,6 +20,7 @@
 	global.sfxFlag = 1
 	global.difficulty = 2
 	--global.playerType = 0
+	global.gameMode = 1 --1 is for normal game, 2 is for training
 
 -- load menu screen
   composer.gotoScene( "scenes.menuView" )

@@ -30,7 +30,7 @@ local physics = require "physics"
 	local netHeight = 5
 	local X, Y, X1, Y1, X2, Y2
 
-	local ballDensity = 0.0030
+	local ballDensity = 0.0020
 	local playerDensity = 0.004
 	local ball
 	local ballDim = 30
@@ -58,10 +58,7 @@ local physics = require "physics"
 	local text
 	local text2
 
-	--velocita' dei player lungo il bordo campo: piu' alta = meno tempo per mirare.
-	--difficulty vale 1=Easy 2=Normal 3=Hard (segmentNumber del controllo in creditsView)
-	local difficultySpeed = { 0.75, 1, 1.3 }
-	local v = 0.16 * ( difficultySpeed[global.difficulty] or 1 )
+	local v = 0.16
 	local netTimeK = 1.2
 
 	local LowerNetCollisionFilter = {categoryBits = 1, maskBits = 16}
@@ -92,6 +89,12 @@ local physics = require "physics"
 	local goal
   local shootPowerDefault=0.008
 
+	local restartBtn
+	local menuBtn
+	local buttonIsEnabled = true
+
+	local winningCondition = '5'
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> GAME
 	function scene:create( event )
@@ -101,14 +104,7 @@ local physics = require "physics"
 
 
 --> SOUND
-	local goalSound = audio.loadSound('assets/sounds/goal.wav')
-
-	--tutti gli effetti sonori passano di qui, cosi' l'interruttore SFX li governa
-	local function playSfx(sound, channel)
-		if global.sfxFlag == 1 then
-			audio.play(sound, {channel=channel})
-		end
-	end
+	local goalSound = audio.loadSound('assets/sounds/goal.mp3')
 
 	--isAwake=false addormenta la palla ma le lascia la velocita': al primo
 	--contatto riparte come prima. Per fermarla davvero va azzerata.
@@ -121,6 +117,9 @@ local physics = require "physics"
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> FUNCTIONS
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	local i = {}
+	local j = {}
+	local delta = {}
 
 	--UTILITIES
 	-- calcola il numero totale di elementi contenuti in un array
@@ -174,17 +173,6 @@ local physics = require "physics"
 	local lenXTable
 	local lenredX
 
-	local i = {}
-	i[1]=0
-	i[2]=0
-	local j = {}
-	j[1]=0
-	j[2]=0
-	local delta = {}
-	delta[1]=1
-	delta[2]=1
-
-
 	--muove player2 lungo la blueLine
 	local function onCompleteMove(player, n, SegmentTransition, playerX, playerY)
 		print(delta[n])
@@ -218,24 +206,26 @@ local physics = require "physics"
 	end
 
 	--inverte il verso del moto di player2
-	local function invert(player, n, SegmentTransition, playerX, playerY)
-		if not playerInPitch[n] then
-			if player.x <= display.contentCenterX - halfpost or player.x >= display.contentCenterX + halfpost then
-				transition.pause(player)
-				delta[n] = delta[n] * (-1)
-				if j[n]==0 then
-					j[n] = 1
-				else
-					j[n] = 0
-				end
-				SegmentTransition = transition.to(player, {
-					time = segmentTime( segmentLenght( player.x, player.y, playerX[i[n]+delta[n]+j[n]], playerY[i[n]+delta[n]+j[n]]), v),
-					x = playerX[i[n]+delta[n]+j[n]],
-					y = playerY[i[n]+delta[n]+j[n]],
-					onComplete=function()
-						onCompleteMove(player, n, SegmentTransition, playerX, playerY);
+	local function invert(event, player, n, SegmentTransition, playerX, playerY)
+		if buttonIsEnabled then
+			if event.phase == "ended" and not playerInPitch[n] then
+				if player.x <= display.contentCenterX - halfpost or player.x >= display.contentCenterX + halfpost then
+					transition.pause(player)
+					delta[n] = delta[n] * (-1)
+					if j[n]==0 then
+						j[n] = 1
+					else
+						j[n] = 0
 					end
-				})
+					SegmentTransition = transition.to(player, {
+						time = segmentTime( segmentLenght( player.x, player.y, playerX[i[n]+delta[n]+j[n]], playerY[i[n]+delta[n]+j[n]]), v),
+						x = playerX[i[n]+delta[n]+j[n]],
+						y = playerY[i[n]+delta[n]+j[n]],
+						onComplete=function()
+							onCompleteMove(player, n, SegmentTransition, playerX, playerY);
+						end
+					})
+				end
 			end
 		end
 	end
@@ -319,68 +309,72 @@ local physics = require "physics"
 	--#grazieGiorgio^2
 	--spara player2 nel campo con direzione normale alla blueLine
 	local function shoot(player, n, SegmentTransition)
-		if not playerInPitch[n] then
-			if player.x == display.contentCenterX - a - halfpost then
-				transition.pause(player)
-        player:applyLinearImpulse( shootPowerDefault, 0, player.x, player.y)
-      elseif player.x > display.contentCenterX - a - halfpost and player.x < display.contentCenterX-halfpost then
-				if player == player1 then
-					local centerBS = display.newCircle(a, display.contentHeight/2+140, 0.1)
-	        centerBS:setFillColor( 0, 0, 0, 0)
-	        local angleBS = angleBetween(centerBS, player)*math.pi/180
-	        local shootAngle = math.atan(b*math.sin(angleBS)/(a*math.cos(angleBS))) + math.pi/2
-					print("AAAAAAAA ANGLE: ".. tostring(shootAngle*180/math.pi))
-	        local shootPowerComp_x = -shootPowerDefault * math.cos(shootAngle)
-	        local shootPowerComp_y = -shootPowerDefault * math.sin(shootAngle)
+		if buttonIsEnabled then
+			if not playerInPitch[n] then
+				if player.y > display.contentCenterY - longside and player.y < display.contentCenterY + longside then
+					if player.x < display.contentCenterX then
+						transition.pause(player)
+		        player:applyLinearImpulse( shootPowerDefault, 0, player.x, player.y)
+					elseif player.x > display.contentCenterX then
+						transition.pause(player)
+		      	player:applyLinearImpulse( -shootPowerDefault, 0, player.x, player.y)
+					end
+				elseif player.x > display.contentCenterX - a - halfpost and player.x < display.contentCenterX-halfpost then
+					if player == player1 then
+						local centerBS = display.newCircle(a, display.contentHeight/2+140, 0.1)
+		        centerBS:setFillColor( 0, 0, 0, 0)
+		        local angleBS = angleBetween(centerBS, player)*math.pi/180
+		        local shootAngle = math.atan(b*math.sin(angleBS)/(a*math.cos(angleBS))) + math.pi/2
+						print("AAAAAAAA ANGLE: ".. tostring(shootAngle*180/math.pi))
+		        local shootPowerComp_x = -shootPowerDefault * math.cos(shootAngle)
+		        local shootPowerComp_y = -shootPowerDefault * math.sin(shootAngle)
+						transition.pause(player)
+		        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
+					else
+		      	local centerAS = display.newCircle(a, display.contentHeight/2-140, 0.1)
+		        centerAS:setFillColor( 0, 0, 0, 0)
+		        local angleAS = angleBetween(centerAS, player)*math.pi/180
+		        local shootAngle = math.atan(b*math.sin(angleAS)/(a*math.cos(angleAS))) + math.pi/2
+		        print("ANGLE: ".. tostring(shootAngle*180/math.pi))
+		    		local shootPowerComp_x = shootPowerDefault * math.cos(shootAngle)
+		        local shootPowerComp_y = shootPowerDefault * math.sin(shootAngle)
+						transition.pause(player)
+		        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
+					end
+	      elseif player.x >= display.contentCenterX - halfpost and player.x <= display.contentCenterX + halfpost then
 					transition.pause(player)
-	        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
-				else
-	      	local centerAS = display.newCircle(a, display.contentHeight/2-140, 0.1)
-	        centerAS:setFillColor( 0, 0, 0, 0)
-	        local angleAS = angleBetween(centerAS, player)*math.pi/180
-	        local shootAngle = math.atan(b*math.sin(angleAS)/(a*math.cos(angleAS))) + math.pi/2
-	        print("ANGLE: ".. tostring(shootAngle*180/math.pi))
-	    		local shootPowerComp_x = shootPowerDefault * math.cos(shootAngle)
-	        local shootPowerComp_y = shootPowerDefault * math.sin(shootAngle)
-					transition.pause(player)
-	        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
-				end
-      elseif player.x >= display.contentCenterX - halfpost and player.x <= display.contentCenterX + halfpost then
-				transition.pause(player)
-				--playerStop(SegmentTransition)
-				if player == player1 then
-        	player:applyLinearImpulse( 0, -shootPowerDefault, player.x, player.y)
-				else
-					player:applyLinearImpulse( 0, shootPowerDefault, player.x, player.y)
-				end
-    	elseif player.x > display.contentCenterX + halfpost and player.x < display.contentCenterX + a + halfpost then
-				if player==player1 then
-					local centerBD = display.newCircle(display.contentCenterX + halfpost, display.contentHeight/2+140, 0.1)
-	        centerBD:setFillColor( 0, 0, 0, 0)
-	        local angleBD = angleBetween(centerBD, player)*math.pi/180
-	        local shootAngle = math.atan(b*math.sin(angleBD)/(a*math.cos(angleBD))) - math.pi/2
-	        print("BBBBBB ANGLE: ".. tostring(shootAngle*180/math.pi))
-	    		local shootPowerComp_x = shootPowerDefault * math.cos(shootAngle)
-	        local shootPowerComp_y = shootPowerDefault * math.sin(shootAngle)
-					transition.pause(player)
-	        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
-				else
-	        local centerAD = display.newCircle(display.contentCenterX + halfpost, display.contentHeight/2-140, 0.1)
-	        centerAD:setFillColor( 0, 0, 0, 0)
-	        local angleAD = angleBetween(centerAD, player)*math.pi/180
-	        local shootAngle = math.atan(b*math.sin(angleAD)/(a*math.cos(angleAD))) - math.pi/2
-					print("ANGLE: ".. tostring(shootAngle*180/math.pi))
-	        local shootPowerComp_x = -shootPowerDefault * math.cos(shootAngle)
-	        local shootPowerComp_y = -shootPowerDefault * math.sin(shootAngle)
-					transition.pause(player)
-	        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
-				end
-      elseif player.x == display.contentCenterX + a + halfpost then
-				transition.pause(player)
-      	player:applyLinearImpulse( -shootPowerDefault, 0, player.x, player.y)
-      end
-			playerInPitch[n] = true
-    end
+					--playerStop(SegmentTransition)
+					if player == player1 then
+	        	player:applyLinearImpulse( 0, -shootPowerDefault, player.x, player.y)
+					else
+						player:applyLinearImpulse( 0, shootPowerDefault, player.x, player.y)
+					end
+	    	elseif player.x > display.contentCenterX + halfpost and player.x < display.contentCenterX + a + halfpost then
+					if player==player1 then
+						local centerBD = display.newCircle(display.contentCenterX + halfpost, display.contentHeight/2+140, 0.1)
+		        centerBD:setFillColor( 0, 0, 0, 0)
+		        local angleBD = angleBetween(centerBD, player)*math.pi/180
+		        local shootAngle = math.atan(b*math.sin(angleBD)/(a*math.cos(angleBD))) - math.pi/2
+		        print("BBBBBB ANGLE: ".. tostring(shootAngle*180/math.pi))
+		    		local shootPowerComp_x = shootPowerDefault * math.cos(shootAngle)
+		        local shootPowerComp_y = shootPowerDefault * math.sin(shootAngle)
+						transition.pause(player)
+		        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
+					else
+		        local centerAD = display.newCircle(display.contentCenterX + halfpost, display.contentHeight/2-140, 0.1)
+		        centerAD:setFillColor( 0, 0, 0, 0)
+		        local angleAD = angleBetween(centerAD, player)*math.pi/180
+		        local shootAngle = math.atan(b*math.sin(angleAD)/(a*math.cos(angleAD))) - math.pi/2
+						print("ANGLE: ".. tostring(shootAngle*180/math.pi))
+		        local shootPowerComp_x = -shootPowerDefault * math.cos(shootAngle)
+		        local shootPowerComp_y = -shootPowerDefault * math.sin(shootAngle)
+						transition.pause(player)
+		        player:applyLinearImpulse(shootPowerComp_x, shootPowerComp_y, player.x, player.y)
+					end
+	      end
+				playerInPitch[n] = true
+	    end
+		end
 	end
 
 
@@ -406,17 +400,6 @@ local physics = require "physics"
 
 	local deltaY = {longside + b, - longside - b }
 
-	--rimuove l'oggetto e libera lo slot: senza azzerarlo resta un riferimento
-	--a un oggetto gia' distrutto, e la rimozione successiva va in errore
-	local function remove(t, n)
-		if t[n] then
-			if t[n].removeSelf then
-				t[n]:removeSelf()
-			end
-			t[n] = nil
-		end
-	end
-
 	--riporta player sulla linea di porta
 	local function goNet(player, n, SegmentTransition, playerX, playerY)
 		transition.pause(player)
@@ -431,32 +414,39 @@ local physics = require "physics"
 	end
 
 	local function restorePower()--ripristina potenza di tiro
-	  shootPowerDefault=0.01
+	  shootPowerDefault = shootPowerDefault/2
 	end
 
 	local function restoreWall(n)
 		if wall[n] then
 			physics.removeBody( wall[n] )
-			remove( wall, n )
+			wall[n]:removeSelf()
+			wall[n] = nil
 		end
 	end
 
 	--funzione che regola l'uso dei powerups
 	local function powerup_usage(player, n, SegmentTransition, playerX, playerY)
+		audio.stop( 6 )
+		if buttonIsEnabled then
 			--power_button_red.fill.effect = "filter.grayscale"
 			power_button[n].alpha=0
 			used[n]=true
 			print ("X")
 			if current[n]==1 then
 				print ("a")
-				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup1_sound.wav")
-				playSfx(powerup_sound[n], 6)
+				if global.sfxFlag==1 then
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup1_sound.mp3")
+					audio.play(powerup_sound[n], {channel=6})
+				end
 				stopBall()
 			elseif current[n]==2 then
 				print ("b")
 				if not wall[n] then
-					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup2_sound.wav" )
-					playSfx(powerup_sound[n], 6)
+					if global.sfxFlag==1 then
+						powerup_sound[n] = audio.loadSound( "assets/sounds/powerup2_sound.mp3" )
+						audio.play(powerup_sound[n], {channel=6})
+					end
 					if player==player1 and player.y>=display.contentCenterY+longside then
 						wall[n]=display.newRect( display.contentCenterX, display.contentCenterY+longside, 100, 5 )
 						physics.addBody( wall[n], "static", {filter = redPlayerCollisionFilter} )
@@ -479,31 +469,42 @@ local physics = require "physics"
 						restoreWall(n);
 					end)
 				else
-					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-					playSfx(powerup_sound[n], 6)
+					if global.sfxFlag==1 then
+						powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.mp3" )
+						audio.play(powerup_sound[n], {channel=6})
+					end
 				end
 			elseif current[n]==3 then
 				print ("c")
-				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup3_sound.wav" )
-				playSfx(powerup_sound[n], 6)
+				if global.sfxFlag==1 then
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup3_sound.mp3" )
+					audio.play(powerup_sound[n], {channel=6})
+				end
 				shootPowerDefault=shootPowerDefault*2
 				timer.performWithDelay(4000, restorePower)
 			elseif current[n]==4 then
 				print ("d")
 				if playerInPitch[n] then
-					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4_sound.wav" )
-					playSfx(powerup_sound[n], 6)
+					if global.sfxFlag==1 then
+						powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4_sound.mp3" )
+						audio.play(powerup_sound[n], {channel=6})
+					end
 					goNet(player, n, SegmentTransition, playerX, playerY)
 				else
-					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-					playSfx(powerup_sound[n], 6)
+					if global.sfxFlag==1 then
+						powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.mp3" )
+						audio.play(powerup_sound[n], {channel=6})
+					end
 				end
 			elseif current[n]==5 then
-				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-				playSfx(powerup_sound[n], 6)
+				if global.sfxFlag==1 then
+					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.mp3" )
+					audio.play(powerup_sound[n], {channel=6})
+				end
 			end
 			print ("Y")
 		end
+	end
 
 	--funzione di display e sorteggio powerup
 	local function powerup(player, n, SegmentTransition, playerX, playerY)
@@ -516,23 +517,53 @@ local physics = require "physics"
 			print("A libero B libero")
 			rand[n]=math.random(5)
 			if rand[n]==1 then
-				loading[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup1N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup1B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup1W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==2 then
-				loading[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup2N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup2B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup2W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B2")
 			elseif rand[n]==3 then
-				loading[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup3N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup3B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup3W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B3")
 			elseif rand[n]==4 then
-				loading[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup4N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup4B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup4W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B4")
 			elseif rand[n]==5 then
-				loading[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup5N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup5B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup5W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B5")
 			end
@@ -552,15 +583,45 @@ local physics = require "physics"
 			else
 				print("counter=5")
 				if rand[n]==1 then
-					power_button[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
+					if (global.fieldType == 1) then --neon
+						power_button[n]=display.newImageRect("assets/powerups/powerup1N.png", 30, 30 )
+					elseif (global.fieldType == 2) then --blak
+						power_button[n]=display.newImageRect("assets/powerups/powerup1B.png", 30, 30 )
+					else --white
+						power_button[n]=display.newImageRect("assets/powerups/powerup1W.png", 30, 30 )
+					end
 				elseif rand[n]==2 then
-					power_button[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
+					if (global.fieldType == 1) then --neon
+						power_button[n]=display.newImageRect("assets/powerups/powerup2N.png", 30, 30 )
+					elseif (global.fieldType == 2) then --blak
+						power_button[n]=display.newImageRect("assets/powerups/powerup2B.png", 30, 30 )
+					else --white
+						power_button[n]=display.newImageRect("assets/powerups/powerup2W.png", 30, 30 )
+					end
 				elseif rand[n]==3 then
-					power_button[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
+					if (global.fieldType == 1) then --neon
+						power_button[n]=display.newImageRect("assets/powerups/powerup3N.png", 30, 30 )
+					elseif (global.fieldType == 2) then --blak
+						power_button[n]=display.newImageRect("assets/powerups/powerup3B.png", 30, 30 )
+					else --white
+						power_button[n]=display.newImageRect("assets/powerups/powerup3W.png", 30, 30 )
+					end
 				elseif rand[n]==4 then
-					power_button[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
+					if (global.fieldType == 1) then --neon
+						power_button[n]=display.newImageRect("assets/powerups/powerup4N.png", 30, 30 )
+					elseif (global.fieldType == 2) then --blak
+						power_button[n]=display.newImageRect("assets/powerups/powerup4B.png", 30, 30 )
+					else --white
+						power_button[n]=display.newImageRect("assets/powerups/powerup4W.png", 30, 30 )
+					end
 				elseif rand[n]==5 then
-					power_button[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
+					if (global.fieldType == 1) then --neon
+						power_button[n]=display.newImageRect("assets/powerups/powerup5N.png", 30, 30 )
+					elseif (global.fieldType == 2) then --blak
+						power_button[n]=display.newImageRect("assets/powerups/powerup5B.png", 30, 30 )
+					else --white
+						power_button[n]=display.newImageRect("assets/powerups/powerup5W.png", 30, 30 )
+					end
 				end
 				if n==2 then
 					power_button[n].x = display.contentCenterX + 78
@@ -585,23 +646,53 @@ local physics = require "physics"
 			loading[n].alpha=0
 			rand[n]=math.random(5)
 			if rand[n]==1 then
-				loading[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup1N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup1B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup1W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==2 then
-				loading[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup2N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup2B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup2W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==3 then
-				loading[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup3N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup3B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup3W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==4 then
-				loading[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup4N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup4B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup4W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			elseif rand[n]==5 then
-				loading[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
+				if (global.fieldType == 1) then
+					loading[n]=display.newImageRect("assets/powerups/powerup5N.png", 30, 30 )
+				elseif (global.fieldType == 2) then
+					loading[n]=display.newImageRect("assets/powerups/powerup5B.png", 30, 30 )
+				else
+					loading[n]=display.newImageRect("assets/powerups/powerup5W.png", 30, 30 )
+				end
 				loading[n].alpha=1
 				print("B1")
 			end
@@ -632,15 +723,45 @@ local physics = require "physics"
 			power_button[n].alpha=0
 			rand[n] = staging_powerup[n]
 			if rand[n]==1 then
-				power_button[n]=display.newImageRect("assets/powerups/powerup1.png", 30, 30 )
+				if (global.fieldType == 1) then --neon
+					power_button[n]=display.newImageRect("assets/powerups/powerup1N.png", 30, 30 )
+				elseif (global.fieldType == 2) then --blak
+					power_button[n]=display.newImageRect("assets/powerups/powerup1B.png", 30, 30 )
+				else --white
+					power_button[n]=display.newImageRect("assets/powerups/powerup1W.png", 30, 30 )
+				end
 			elseif rand[n]==2 then
-				power_button[n]=display.newImageRect("assets/powerups/powerup2.png", 30, 30 )
+				if (global.fieldType == 1) then --neon
+					power_button[n]=display.newImageRect("assets/powerups/powerup2N.png", 30, 30 )
+				elseif (global.fieldType == 2) then --blak
+					power_button[n]=display.newImageRect("assets/powerups/powerup2B.png", 30, 30 )
+				else --white
+					power_button[n]=display.newImageRect("assets/powerups/powerup2W.png", 30, 30 )
+				end
 			elseif rand[n]==3 then
-				power_button[n]=display.newImageRect("assets/powerups/powerup3.png", 30, 30 )
+				if (global.fieldType == 1) then --neon
+					power_button[n]=display.newImageRect("assets/powerups/powerup3N.png", 30, 30 )
+				elseif (global.fieldType == 2) then --blak
+					power_button[n]=display.newImageRect("assets/powerups/powerup3B.png", 30, 30 )
+				else --white
+					power_button[n]=display.newImageRect("assets/powerups/powerup3W.png", 30, 30 )
+				end
 			elseif rand[n]==4 then
-				power_button[n]=display.newImageRect("assets/powerups/powerup4.png", 30, 30 )
+				if (global.fieldType == 1) then --neon
+					power_button[n]=display.newImageRect("assets/powerups/powerup4N.png", 30, 30 )
+				elseif (global.fieldType == 2) then --blak
+					power_button[n]=display.newImageRect("assets/powerups/powerup4B.png", 30, 30 )
+				else --white
+					power_button[n]=display.newImageRect("assets/powerups/powerup4W.png", 30, 30 )
+				end
 			elseif rand[n]==5 then
-				power_button[n]=display.newImageRect("assets/powerups/powerup5.png", 30, 30 )
+				if (global.fieldType == 1) then --neon
+					power_button[n]=display.newImageRect("assets/powerups/powerup5N.png", 30, 30 )
+				elseif (global.fieldType == 2) then --blak
+					power_button[n]=display.newImageRect("assets/powerups/powerup5B.png", 30, 30 )
+				else --white
+					power_button[n]=display.newImageRect("assets/powerups/powerup5W.png", 30, 30 )
+				end
 			end
 			if n==2 then
 			 power_button[n].x = display.contentCenterX + 78
@@ -671,79 +792,322 @@ local physics = require "physics"
 	end
 
 
-	powerup_start[2]=timer.performWithDelay( 700, function()
-																powerup(player2, 2, blueSegmentTransition, blueX, blueY);
-															end)
 	powerup_start[1]=timer.performWithDelay( 700, function()
 																powerup(player1, 1, redSegmentTransition, redX, redY);
 															end)
 
---MENU
-local function menuView()
-	timer.pause(powerup_start[1])
-	timer.pause(powerup_start[2])
-	for i = 1, 2 do
-		remove( loading, i )
-		remove( power_button, i )
-		remove( wall, i )
+	if global.gameMode == 1 then
+		powerup_start[2]=timer.performWithDelay( 700, function()
+															powerup(player2, 2, blueSegmentTransition, blueX, blueY);
+														end)
+		end
+
+
+	--MENU
+
+	local function menuView()
+		timer.pause(powerup_start[1])
+		if powerup_start[2] then
+			timer.pause(powerup_start[2])
+		end
+		if loading[1] then
+			loading[1]:removeSelf()
+			loading[1] = nil
+		end
+		if loading[2] then
+			loading[2]:removeSelf()
+			loading[2] = nil
+		end
+		if power_button[1] then
+			power_button[1]:removeSelf()
+			power_button[1] = nil
+		end
+		if power_button[2] then
+			power_button[2]:removeSelf()
+			power_button[2] = nil
+		end
+		if wall[1] then
+			wall[1]:removeSelf()
+			wall[1] = nil
+		end
+		if wall[2] then
+			wall[2]:removeSelf()
+			wall[2] = nil
+		end
+		if target1  ~= nil  then
+			target1=nil
+		end
+		if target2 ~= nil  then
+			target2 = nil
+		end
+		if target3 ~= nil  then
+			target3=nil
+		end
+		if gameResumeBtn then
+			gameResumeBtn:removeSelf()
+		end
+		global.game = 1
+		composer.gotoScene( "scenes.menuView", "fade", 300 )
+		return true
 	end
-	composer.gotoScene( "scenes.menuView", "fade", 300 )
-	return true
+
+----------------------------------------------------------------------------------------------------
+--TRAINING SECTION
+----------------------------------------------------------------------------------------------------
+
+if global.gameMode == 2 then
+
+	local cheers = audio.loadSound("assets/sounds/trainingCheers.mp3")
+
+	local targetCounter = 0
+	local trainingStage = 0
+
+	local function onLocalCollision(object, event)
+		if ( event.phase == "began" ) then
+			audio.play(cheers, {channel=5})
+		elseif ( event.phase == "ended" ) then
+			object:removeSelf()
+			targetCounter = targetCounter + 1
+			if targetCounter == 3 then
+				trainingStage = trainingStage + 1
+				targetSpawner()
+			end
+		end
+	end
+
+	function targetSpawner()
+		if trainingStage == 0 then
+
+			target1 = display.newImageRect("assets/training/target1.png", 40, 40)
+			target1.x = display.contentCenterX
+			target1.y = display.contentCenterY -longside - b
+
+			target2 = display.newImageRect("assets/training/target1.png", 40, 40)
+			target2.x = display.contentCenterX - 2.5*halfpost
+			target2.y = display.contentCenterY - longside - halfpost
+
+			target3 = display.newImageRect("assets/training/target1.png", 40, 40)
+			target3.x = display.contentCenterX + 2.5*halfpost
+			target3.y = display.contentCenterY - longside - halfpost
+
+			physics.addBody(target1, "static", {filter = ballCollisionFilter})
+			target1.collision = onLocalCollision
+			target1:addEventListener( "collision" )
+
+			physics.addBody(target2, "static", {filter = ballCollisionFilter})
+			target2.collision = onLocalCollision
+			target2:addEventListener( "collision" )
+
+			physics.addBody(target3, "static", {filter = ballCollisionFilter})
+			target3.collision = onLocalCollision
+			target3:addEventListener( "collision" )
+
+		elseif trainingStage >= 1 then
+			menuView()
+
+		end
+	end
+
+	targetSpawner()
+
 end
 
+--SOCIAL SHARE
+
+	if "simulator" == system.getInfo( "environment" ) then
+    native.showAlert( "Build for device", "This plugin is not supported on the Corona Simulator.", { "OK" } )
+	end
+
+	-- Use the Android "Holo Dark" theme for this sample
+	widget.setTheme( "widget_theme_android_holo_dark" )
+
+	-- Executed upon touching and releasing the button created below
+	local function onShareButtonReleased(event)
+		local serviceName = "share"
+    --local serviceName = event.target.id
+    local isAvailable = native.canShowPopup( "social", serviceName )
+
+    -- If it is possible to show the popup
+    if isAvailable then
+        local listener = {}
+        function listener:popup( event )
+          print( "name(" .. event.name .. ") type(" .. event.type .. ") action(" .. tostring(event.action) .. ") limitReached(" .. tostring(event.limitReached) .. ")" )
+        end
+        -- Show the popup
+        native.showPopup( "social",
+        {
+            service = serviceName, -- The service key is ignored on Android.
+            message = "I just had an awesome game on Doink! Play now: https://goo.gl/snA2T3 #Doink!",
+            listener = listener
+        })
+    else
+      if isSimulator then
+        native.showAlert( "Build for device", "This plugin is not supported on the Corona Simulator, please build for an iOS/Android device or the Xcode simulator", { "OK" } )
+      else
+        -- Popup isn't available.. Show error message
+        native.showAlert( "Cannot send " .. serviceName .. " message.", "Please setup your " .. serviceName .. " account or check your network connection (on android this means that the package/app (ie Twitter) is not installed on the device)", { "OK" } )
+      end
+  	end
+	end
+
+	local function resumeView()
+
+		if player1Score.text ~= winningCondition and player2Score.text ~= winningCondition then
+
+			buttonIsEnabled = true
+
+			physics.start()
+			if powerup_start[1] then
+				timer.resume(powerup_start[1])
+			end
+			if powerup_start[2] then
+				timer.resume(powerup_start[2])
+			end
+
+			if not playerInPitch[1] then
+				--transition.resume(player1)
+				startMoving(player1, 1, redSegmentTransition, redX, redY)
+			end
+			if not playerInPitch[2] then
+				--transition.resume(player2)
+				startMoving(player2, 2, blueSegmentTransition, blueX, blueY)
+			end
+			gameResumeBtn:removeSelf()
+			shareBtn:removeSelf()
+			menuBtn2:removeSelf()
+			if achievementText then
+			achievementText:removeSelf()
+				end
+
+		end
+
+	end
+
+	local function menuPopUp(mode)
+
+		if buttonIsEnabled then
+
+			buttonIsEnabled = false
+
+			physics.pause()
+			if powerup_start[1] then
+				timer.pause(powerup_start[1])
+			end
+			if powerup_start[2] then
+				timer.pause(powerup_start[2])
+			end
+
+			if not playerInPitch[1] then
+				transition.pause(player1)
+			end
+
+			if not playerInPitch[2] then
+				transition.pause(player2)
+			end
+
+
+			if mode==1 then
+				overlay=display.newImageRect("assets/images/pause.png", 320, 569)
+			else
+				overlay=display.newImageRect("assets/images/gg.png", 320, 569)
+			end
+
+			overlay.x = display.contentCenterX
+			overlay.y = display.contentCenterY
+
+			shareBtn = widget.newButton{
+					defaultFile= "assets/buttons/back_roundW.png",
+			    id = "share",
+			    left = 0,
+			    top = 430,
+			    width = 250,
+					height = 90,
+			    --label = "Share on socials",
+					onRelease = onShareButtonReleased,
+			    --[[onRelease = function()
+						onShareButtonReleased(event)
+						timer.performWithDelay(300, function()
+							overlay:removeSelf();
+						end)
+					end,]]
+			}
+			shareBtn.x = display.contentCenterX
+			if mode==1 then
+				shareBtn.y = display.contentCenterY+1*longside
+			else
+				shareBtn.y = display.contentCenterY+0.7*longside
+			end
+
+			menuBtn2 = widget.newButton{
+				defaultFile= "assets/buttons/back_roundW.png",
+				id = "menu",
+				left = 0,
+				top = 430,
+				width = 240,
+				height = 90,
+				--label = "Return to Menu",
+				onRelease = function()
+					menuView()
+					timer.performWithDelay(300, function()
+						overlay:removeSelf();
+					end)
+				end,
+			}
+
+			menuBtn2.x = display.contentCenterX
+			if mode==1 then
+				menuBtn2.y = display.contentCenterY-0.6*longside
+			else
+				menuBtn2.y = display.contentCenterY-0*longside
+			end
+
+			if mode==1 then
+				gameResumeBtn = widget.newButton{
+					defaultFile= "assets/buttons/back_roundW.png",
+					id = "resume",
+					left = 0,
+					top = 430,
+					width = 240,
+					height = 90,
+					--label = "Resume game",
+					onRelease = function()
+						resumeView()
+						overlay:removeSelf()
+					end,
+				}
+
+				gameResumeBtn.x = display.contentCenterX
+				gameResumeBtn.y = display.contentCenterY+0.2*longside
+			end
+
+			sceneGroup:insert( menuBtn2 )
+			sceneGroup:insert( shareBtn )
+			if mode==1 then
+				sceneGroup:insert( gameResumeBtn )
+			end
+
+		end
+
+	end
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	--> BACKGROUND
 	if (global.fieldType==1) then
 		background = display.newImageRect( "assets/fields/field1.png", display.contentWidth, display.contentHeight*119/100 )
-		background.x = display.contentCenterX
-		background.y = display.contentCenterY
 	elseif (global.fieldType==2) then
 		background = display.newImageRect( "assets/fields/field2.png", display.contentWidth, display.contentHeight*119/100 )
-		background.x = display.contentCenterX
-		background.y = display.contentCenterY
 	elseif (global.fieldType==3) then
 		background = display.newImageRect( "assets/fields/field3.png", display.contentWidth, display.contentHeight*119/100 )
-		background.x = display.contentCenterX
-		background.y = display.contentCenterY
 	else
 		background = display.newImageRect( "assets/fields/field0.png", display.contentWidth, display.contentHeight*119/100 )
-		background.x = display.contentCenterX
-		background.y = display.contentCenterY
 	end
+	background.x = display.contentCenterX
+	background.y = display.contentCenterY
 
-	--> GOALS
-	if (global.fieldType==0) then
-		porta1 = display.newImageRect("assets/fields/porta100.png", 80, 80)
-		porta1.x = display.contentCenterX
-		porta1.y = display.contentHeight*3.6/100
-		porta2 = display.newImageRect("assets/fields/porta200.png", 80, 80)
-		porta2.x = display.contentCenterX
-		porta2.y = display.contentHeight*96.4/100
-	end
-
---[[ lasciate commentato plz
-if (global.fieldType==0) then
-	porta1 = display.newImageRect(".png", 80, 80)
-	porta1.x = display.contentCenterX
-	porta1.y = display.contentHeight*3.6/100
-	porta2 = display.newImageRect(".png", 80, 80)
-	porta2.x = display.contentCenterX
-	porta2.y = display.contentHeight*96.4/100
-elseif (global.fieldType==1) then
-	porta1 = display.newImageRect(".png", 80, 80)
-	porta1.x = display.contentCenterX
-	porta1.y = display.contentHeight*3.6/100
-	porta2 = display.newImageRect(".png", 80, 80)
-	porta2.x = display.contentCenterX
-	porta2.y = display.contentHeight*96.4/100
-end
-]]
 --> ARENA
 
 --player paths
-
 
 --blueX and blueY tables, creation of timeTable
 	X1 = display.contentCenterX - a - halfpost
@@ -826,10 +1190,13 @@ end
 	local blueLine = display.newLine(display.contentCenterX - a - halfpost, display.contentCenterY, display.contentCenterX - a - halfpost, display.contentCenterY - longside)
 	blueLine.strokeWidth = strokeWidth
 
-	if (global.fieldType==2) then
-		--blueLine:setStrokeColor(0, 1, 0, 0.6)
-	else
-		--blueLine:setStrokeColor(0, 0, 1, 0.4)
+	if (global.fieldType == 3) then
+		blueLine:setStrokeColor( 0, 0, 1, 0.4)
+	elseif (global.fieldType == 2) then
+		blueLine:setStrokeColor( 0, 0, 1, 0.4)
+	elseif (global.fieldType == 0) then
+		blueLine.alpha=0
+	elseif (global.fieldType == 1) then
 		blueLine.alpha=0
 	end
 
@@ -866,12 +1233,13 @@ end
 	local redLine = display.newLine(display.contentCenterX - a - halfpost, display.contentCenterY, display.contentCenterX - a - halfpost, display.contentCenterY + longside)
 	redLine.strokeWidth = strokeWidth
 
-	if (global.fieldType==3) then
-		--redLine:setStrokeColor(153, 0, 153, 0.4)
-	elseif (global.fieldType==2) then
-		--redLine:setStrokeColor(1, 0, 0, 0.6)
-	else
-		--redLine:setStrokeColor(1, 0, 0, 0.4)
+	if (global.fieldType == 3) then
+		redLine:setStrokeColor( 1, 0, 0, 0.4)
+	elseif (global.fieldType == 2) then
+		redLine:setStrokeColor( 1, 0, 0, 0.4)
+	elseif (global.fieldType == 0) then
+		redLine.alpha=0
+	elseif (global.fieldType == 1) then
 		redLine.alpha=0
 	end
 
@@ -914,15 +1282,10 @@ end
 	physics.addBody(lowerNet, "static", {filter = LowerNetCollisionFilter})
 
 --> SCORES
-if (global.fieldType==3) then
-	player1Score = display.newText('0',display.contentCenterX, display.contentHeight*80/100, 'Courier-Bold',display.contentHeight*20/100)
-	player1Score:setTextColor(153, 0, 153, 0.4)
-else
 	player1Score = display.newText('0',display.contentCenterX, display.contentHeight*80/100, 'Courier-Bold',display.contentHeight*20/100)
 	player1Score:setTextColor(1, 0, 0, 0.4)
-end
 
-if (global.fieldType==2) then
+if (global.fieldType==0) then
 	player2Score = display.newText('0', display.contentCenterX, display.contentHeight*18/100, 'Courier-Bold', display.contentHeight*20/100)
 	player2Score:setTextColor(0, 1, 0, 0.4)
 else
@@ -931,36 +1294,26 @@ else
 end
 
 --> BALL
-
 if(global.ballType==1) then
 	ball = display.newImageRect( "assets/balls/ball1.png", ballDim, ballDim)
-	ball.x = display.contentCenterX
-	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==2) then
 	ball = display.newImageRect( "assets/balls/ball2.png", ballDim, ballDim)
-	ball.x = display.contentCenterX
-	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==3) then
 	ball = display.newImageRect( "assets/balls/ball3.png", ballDim, ballDim)
-	ball.x = display.contentCenterX
-	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==4) then
 	ball = display.newImageRect( "assets/balls/ball4.png", ballDim, ballDim)
-	ball.x = display.contentCenterX
-	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==5) then
 	ball = display.newImageRect( "assets/balls/ball5.png", ballDim, ballDim)
-	ball.x = display.contentCenterX
-	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 else
-	ball = display.newCircle(display.contentCenterX, display.contentCenterY, ballDim/2)
-	ball:setFillColor(1)
-	physics.addBody(ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	ball = display.newImageRect( "assets/balls/ball6.png", ballDim, ballDim)
+end
+ball.x = display.contentCenterX
+ball.y = display.contentCenterY
+if global.gameMode == 1 then
+	physics.addBody( ball, "dynamic", {density=0.4*playerDensity, radius=ballDim/1.5, bounce=1, filter = ballCollisionFilter})
+end
+if global.gameMode == 2 then
+	ball.alpha = 0
 end
 
 --> PLAYERS
@@ -969,45 +1322,117 @@ end
 	player1:setFillColor(1, 0, 0, 1)
 	physics.addBody(player1, "dynamic", {density=playerDensity, radius=pdim/2, bounce=1, filter = redPlayerCollisionFilter})
 
-	player2 = display.newCircle(display.contentCenterX - a - halfpost, display.contentCenterY, pdim)
-	player2:setFillColor(0, 0, 1, 1)
+	player2 = display.newCircle(display.contentCenterX + a + halfpost, display.contentCenterY, pdim)
+	if (global.fieldType == 0) then
+		player2:setFillColor(0, 1, 0, 1)
+	else
+		player2:setFillColor(0, 0, 1, 1)
+	end
 	physics.addBody(player2, "dynamic", {density=playerDensity, radius=pdim/2, bounce=1, filter = bluePlayerCollisionFilter})
 
-	onCompleteMove(player2, 2, blueSegmentTransition, blueX, blueY )  -- start moving
+	if global.gameMode == 2 then
+		player2.alpha = 0
+	end
+
+	i[1]=0
+	i[2]=lenXTable
+	j[1]=0
+	j[2]=1
+	delta[1]=1
+	delta[2]=-1
+
 	onCompleteMove(player1, 1, redSegmentTransition, redX, redY )  -- start moving
+	if global.gameMode == 1 then
+		onCompleteMove(player2, 2, blueSegmentTransition, blueX, blueY )  -- start moving
+	end
 
 --> BUTTONS
+	if (global.fieldType == 1) then
+		button1 = display.newImageRect( "assets/buttons/btnGreenNeon.png", 65, 65  )
+		button1.x = display.contentWidth*10/100
+		button1.y = display.contentHeight*102/100
 
-	button1 = display.newImageRect( "assets/buttons/bottone2_prova.png", 180, 180  )
-	button1.x = display.contentWidth*10/100
-	button1.y = display.contentHeight*102/100
+		button2 = display.newImageRect( "assets/buttons/btnRedNeon.png", 65, 65  )
+		button2.x = display.contentWidth*90/100
+		button2.y = display.contentHeight*102/100
 
-	button2 = display.newImageRect( "assets/buttons/bottone1_prova.png", 180, 180  )
-	button2.x = display.contentWidth*90/100
-	button2.y = display.contentHeight*102/100
+		button3 = display.newImageRect( "assets/buttons/btnGreenNeon.png", 65, 65  )
+		button3.x = display.contentWidth*90/100
+		button3.y = display.contentHeight*-2/100
 
-	button3 = display.newImageRect( "assets/buttons/bottone2_prova.png", 180, 180  )
-	button3.x = display.contentWidth*90/100
-	button3.y = display.contentHeight*-2/100
+		button4 = display.newImageRect( "assets/buttons/btnRedNeon.png", 65, 65  )
+		button4.x = display.contentWidth*10/100
+		button4.y = display.contentHeight*-2/100
 
-	button4 = display.newImageRect( "assets/buttons/bottone1_prova.png", 180, 180  )
-	button4.x = display.contentWidth*10/100
-	button4.y = display.contentHeight*-2/100
+		restartBtn = display.newImageRect( "assets/buttons/restartNeon.png", display.contentWidth*20/100, display.contentWidth*20/100)
+		restartBtn.x = display.contentWidth*85/100
+		restartBtn.y = display.contentWidth*90/100
 
-	restartBtn = display.newImageRect( "assets/buttons/restart_round.png", display.contentWidth*20/100, display.contentWidth*20/100)
-	restartBtn.x = display.contentWidth*85/100
-	restartBtn.y = display.contentWidth*25/100
+		menuBtn=display.newImageRect('assets/buttons/menuNeon.png',  display.contentWidth*20/100, display.contentWidth*20/100)
+		menuBtn.x = display.contentWidth*15/100
+		menuBtn.y = display.contentWidth*60/100
+		menuBtn:addEventListener('tap', function()
+			menuPopUp(1);
+			end)
+	else
+		button1 = display.newImageRect( "assets/buttons/btnGreenNeon.png", 65, 65  )
+		button1.x = display.contentWidth*10/100
+		button1.y = display.contentHeight*102/100
 
-	menuBtn=display.newImageRect('assets/buttons/menu_round.png',  display.contentWidth*20/100, display.contentWidth*20/100)
-	menuBtn.x = display.contentWidth*15/100
-	menuBtn.y = display.contentWidth*25/100
-	menuBtn:addEventListener('tap', menuView)
+		button2 = display.newImageRect( "assets/buttons/btnRedNeon.png", 65, 65  )
+		button2.x = display.contentWidth*90/100
+		button2.y = display.contentHeight*102/100
+
+		button3 = display.newImageRect( "assets/buttons/btnGreenNeon.png", 65, 65  )
+		button3.x = display.contentWidth*90/100
+		button3.y = display.contentHeight*-2/100
+
+		button4 = display.newImageRect( "assets/buttons/btnRedNeon.png", 65, 65  )
+		button4.x = display.contentWidth*10/100
+		button4.y = display.contentHeight*-2/100
+
+		if (global.fieldType == 2) then
+			restartBtn = display.newImageRect( "assets/buttons/restartBlack.png", display.contentWidth*20/100, display.contentWidth*20/100)
+			restartBtn.x = display.contentWidth*85/100
+			restartBtn.y = display.contentWidth*90/100
+		else
+			restartBtn = display.newImageRect( "assets/buttons/restartWhite.png", display.contentWidth*20/100, display.contentWidth*20/100)
+			restartBtn.x = display.contentWidth*85/100
+			restartBtn.y = display.contentWidth*90/100
+		end
+
+		if (global.fieldType == 2) then
+			menuBtn=display.newImageRect('assets/buttons/menuBlack.png',  display.contentWidth*20/100, display.contentWidth*20/100)
+			menuBtn.x = display.contentWidth*15/100
+			menuBtn.y = display.contentWidth*60/100
+		else
+			menuBtn=display.newImageRect('assets/buttons/menuWhite.png',  display.contentWidth*20/100, display.contentWidth*20/100)
+			menuBtn.x = display.contentWidth*15/100
+			menuBtn.y = display.contentWidth*60/100
+		end
+		menuBtn:addEventListener('tap', function()
+			menuPopUp(1);
+			end)
+	end
 
 	--button functions
 	local function reset()
-		ball.x = display.contentCenterX
-		ball.y = display.contentCenterY
-		stopBall()
+		if buttonIsEnabled then
+			ball.x = display.contentCenterX
+			ball.y = display.contentCenterY
+			stopBall()
+			playerInPitch[1] = true
+			playerInPitch[2] = true
+			transition.pause(player1)
+			transition.pause(player2)
+			player1.isAwake = false
+			player2.isAwake = false
+			player1.y = display.contentCenterY
+			player2.y = display.contentCenterY
+			player1.x = display.contentCenterX - halfpost - a
+			player2.x = display.contentCenterX + halfpost + a
+		end
+
 	end
 
 	local function removeGoal()
@@ -1022,42 +1447,60 @@ end
 				goal = display.newImageRect("assets/goal/goalDown.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
-				playSfx(goalSound, 5)
+				if (global.soundFlag==1) then
+					audio.play(goalSound, {channel=5})
+				end
 				timer.performWithDelay (1000, removeGoal)
 	      player2Score.text = tostring(tonumber(player2Score.text) + 1)
-	      ball.x = display.contentCenterX
-	      ball.y = display.contentCenterY
-	      stopBall()
-	      score = score+1
-	      return score
+	      reset()
+				print(("GOAL"))
+				if player2Score.text == winningCondition then
+					physics.pause()
+					menuPopUp(2)
+					print(("GOAL"))
+				else
+ 					return score
+				end
 	    elseif(ball.y < -5) then
 				goal = display.newImageRect("assets/goal/goalUp.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
-				playSfx(goalSound, 5)
+				if (global.soundFlag==1) then
+					audio.play(goalSound, {channel=5})
+				end
 				timer.performWithDelay (1000, removeGoal)
 	      player1Score.text = tostring(tonumber(player1Score.text) + 1)
-	      ball.x = display.contentCenterX
-	      ball.y = display.contentCenterY
-	      stopBall()
-	      score = score+1
-	      return score
+	      reset()
+				print(("GOAL"))
+				if player1Score.text == winningCondition then
+				 physics.pause()
+ 				 menuPopUp(2)
+				 print(("GOAL"))
+ 			 else
+ 				 return score
+ 			 end
 	    end
 		end
 	end
 
---> EVENT LISTENERS
-
---event listeners for powerup4_sound
-	--timer.performWithDelay(9000, powerup, 0)
-
 --event listerner for goal check function
 	Runtime:addEventListener("enterFrame", check)
 
+--> EVENT listeners
+Runtime:addEventListener( "enterFrame", function()
+	Hooking(player1, 1, redSegmentTransition, redX, redY);
+end)
+
+if global.gameMode == 1 then
+	Runtime:addEventListener( "enterFrame", function()
+		Hooking(player2, 2, blueSegmentTransition, blueX, blueY);
+	end)
+end
+
 --event listeners for buttons
 	--un solo tocco genera piu' eventi (began, moved, ended): senza filtrare la
-	--fase l'azione partiva 2-3 volte, e per invert le inversioni pari si
-	--annullavano riportando il player nella direzione di partenza
+	--fase il tiro partiva 2-3 volte, applicando piu' impulsi. invert filtra gia'
+	--su "ended" al proprio interno.
 	button2:addEventListener( "touch", function( event )
 		if event.phase == "began" then
 			shoot(player1, 1, redSegmentTransition);
@@ -1065,47 +1508,29 @@ end
 		return true
 	end)
 
-	button4:addEventListener( "touch", function( event )
-		if event.phase == "began" then
-			shoot(player2, 2, blueSegmentTransition);
-		end
-		return true
+	if global.gameMode == 1 then
+		button4:addEventListener( "touch", function( event )
+			if event.phase == "began" then
+				shoot(player2, 2, blueSegmentTransition);
+			end
+			return true
+		end)
+	end
+
+	button1:addEventListener( "touch", function(event)
+		invert(event, player1, 1, redSegmentTransition, redX, redY);
 	end)
 
-	button1:addEventListener( "touch", function( event )
-		if event.phase == "began" then
-			invert(player1, 1, redSegmentTransition, redX, redY);
-		end
-		return true
-	end)
-
-	button3:addEventListener( "touch", function( event )
-		if event.phase == "began" then
-			invert(player2, 2, blueSegmentTransition, blueX, blueY);
-		end
-		return true
-	end)
-
-	Runtime:addEventListener( "enterFrame", function()
-		Hooking(player1, 1, redSegmentTransition, redX, redY);
-	end)
-
-	Runtime:addEventListener( "enterFrame", function()
-		Hooking(player2, 2, blueSegmentTransition, blueX, blueY);
-	end)
+	if global.gameMode == 1 then
+		button3:addEventListener( "touch", function(event)
+			invert(event, player2, 2, blueSegmentTransition, blueX, blueY);
+		end)
+	end
 
 	restartBtn:addEventListener( "tap", reset)
 
-
-
 	-- all display objects must be inserted into group
 	sceneGroup:insert( background )
-	if (porta1) then
-	sceneGroup:insert( porta1 )
-	end
-	if (porta2) then
-		sceneGroup:insert( porta2 )
-	end
 	sceneGroup:insert( redLine )
 	sceneGroup:insert( blueLine )
 	sceneGroup:insert( upperNet )
@@ -1121,6 +1546,12 @@ end
 	sceneGroup:insert( button4 )
 	sceneGroup:insert( restartBtn )
 	sceneGroup:insert( menuBtn )
+	if global.gameMode == 2 then
+		sceneGroup:insert( target1 )
+		sceneGroup:insert( target2 )
+		sceneGroup:insert( target3 )
+	end
+
 end
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function scene:hide( event )
