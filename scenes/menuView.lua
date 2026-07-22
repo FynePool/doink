@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local crdBtn, playBtn, trnBtn
+
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
@@ -37,7 +40,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 
 --play button (avvia il game)
-	local playBtn = widget.newButton{
+	playBtn = widget.newButton{
 		defaultFile="assets/buttons/playBtn.png",
 		overFile="assets/buttons/playBtnPressed.png",
 		width= display.contentWidth*67.5/100,
@@ -48,7 +51,7 @@ function scene:create( event )
 	playBtn.y = display.contentHeight*30/100
 
 	--training button
-	local trnBtn = widget.newButton{
+	trnBtn = widget.newButton{
 		defaultFile="assets/buttons/trnBtn.png",
 		overFile="assets/buttons/trnBtnPressed.png",
 		width= display.contentWidth*67.5/100,
@@ -59,7 +62,7 @@ function scene:create( event )
 	trnBtn.y = display.contentHeight*60/100
 
 --credits button
-	local crdBtn = widget.newButton{
+	crdBtn = widget.newButton{
 		defaultFile="assets/buttons/settings.png",
 		overFile="assets/buttons/settingsPressed.png",
 		width=35, height=35,

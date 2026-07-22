@@ -58,7 +58,10 @@ local physics = require "physics"
 	local text
 	local text2
 
-	local v = 0.16
+	--velocita' dei player lungo il bordo campo: piu' alta = meno tempo per mirare.
+	--difficulty vale 1=Easy 2=Normal 3=Hard (segmentNumber del controllo in creditsView)
+	local difficultySpeed = { 0.75, 1, 1.3 }
+	local v = 0.16 * ( difficultySpeed[global.difficulty] or 1 )
 	local netTimeK = 1.2
 
 	local LowerNetCollisionFilter = {categoryBits = 1, maskBits = 16}
@@ -99,6 +102,21 @@ local physics = require "physics"
 
 --> SOUND
 	local goalSound = audio.loadSound('assets/sounds/goal.wav')
+
+	--tutti gli effetti sonori passano di qui, cosi' l'interruttore SFX li governa
+	local function playSfx(sound, channel)
+		if global.sfxFlag == 1 then
+			audio.play(sound, {channel=channel})
+		end
+	end
+
+	--isAwake=false addormenta la palla ma le lascia la velocita': al primo
+	--contatto riparte come prima. Per fermarla davvero va azzerata.
+	local function stopBall()
+		ball:setLinearVelocity(0, 0)
+		ball.angularVelocity = 0
+		ball.isAwake = false
+	end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> FUNCTIONS
@@ -432,13 +450,13 @@ local physics = require "physics"
 			if current[n]==1 then
 				print ("a")
 				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup1_sound.wav")
-				audio.play(powerup1_sound, {channel=6})
-				ball.isAwake=false
+				playSfx(powerup_sound[n], 6)
+				stopBall()
 			elseif current[n]==2 then
 				print ("b")
 				if not wall[n] then
 					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup2_sound.wav" )
-					audio.play(powerup2_sound, {channel=6})
+					playSfx(powerup_sound[n], 6)
 					if player==player1 and player.y>=display.contentCenterY+longside then
 						wall[n]=display.newRect( display.contentCenterX, display.contentCenterY+longside, 100, 5 )
 						physics.addBody( wall[n], "static", {filter = redPlayerCollisionFilter} )
@@ -462,27 +480,27 @@ local physics = require "physics"
 					end)
 				else
 					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-					audio.play(powerup_sound[n], {channel=6})
+					playSfx(powerup_sound[n], 6)
 				end
 			elseif current[n]==3 then
 				print ("c")
 				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup3_sound.wav" )
-				audio.play(powerup_sound[n], {channel=6})
+				playSfx(powerup_sound[n], 6)
 				shootPowerDefault=shootPowerDefault*2
 				timer.performWithDelay(4000, restorePower)
 			elseif current[n]==4 then
 				print ("d")
 				if playerInPitch[n] then
 					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4_sound.wav" )
-					audio.play(powerup_sound[n], {channel=6})
+					playSfx(powerup_sound[n], 6)
 					goNet(player, n, SegmentTransition, playerX, playerY)
 				else
 					powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-					audio.play(powerup_sound[n], {channel=6})
+					playSfx(powerup_sound[n], 6)
 				end
 			elseif current[n]==5 then
 				powerup_sound[n] = audio.loadSound( "assets/sounds/powerup4a_sound.m4a" )
-				audio.play(powerup_sound[n], {channel=6})
+				playSfx(powerup_sound[n], 6)
 			end
 			print ("Y")
 		end
@@ -918,27 +936,27 @@ if(global.ballType==1) then
 	ball = display.newImageRect( "assets/balls/ball1.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==2) then
 	ball = display.newImageRect( "assets/balls/ball2.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==3) then
 	ball = display.newImageRect( "assets/balls/ball3.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==4) then
 	ball = display.newImageRect( "assets/balls/ball4.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 elseif(global.ballType==5) then
 	ball = display.newImageRect( "assets/balls/ball5.png", ballDim, ballDim)
 	ball.x = display.contentCenterX
 	ball.y = display.contentCenterY
-	physics.addBody( ball, "dynamic", {radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
+	physics.addBody( ball, "dynamic", {density=ballDensity, radius=ballDim/2, bounce=1, filter = ballCollisionFilter})
 else
 	ball = display.newCircle(display.contentCenterX, display.contentCenterY, ballDim/2)
 	ball:setFillColor(1)
@@ -989,7 +1007,7 @@ end
 	local function reset()
 		ball.x = display.contentCenterX
 		ball.y = display.contentCenterY
-		ball.isAwake = false
+		stopBall()
 	end
 
 	local function removeGoal()
@@ -1004,28 +1022,24 @@ end
 				goal = display.newImageRect("assets/goal/goalDown.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
-				if (global.soundFlag==1) then
-					audio.play(goalSound, {channel=5})
-				end
+				playSfx(goalSound, 5)
 				timer.performWithDelay (1000, removeGoal)
 	      player2Score.text = tostring(tonumber(player2Score.text) + 1)
 	      ball.x = display.contentCenterX
 	      ball.y = display.contentCenterY
-	      ball.isAwake = false
+	      stopBall()
 	      score = score+1
 	      return score
 	    elseif(ball.y < -5) then
 				goal = display.newImageRect("assets/goal/goalUp.png", display.contentWidth, display.contentHeight)
 				goal.x = display.contentCenterX
 				goal.y = display.contentCenterY
-				if (global.soundFlag==1) then
-					audio.play(goalSound, {channel=5})
-				end
+				playSfx(goalSound, 5)
 				timer.performWithDelay (1000, removeGoal)
 	      player1Score.text = tostring(tonumber(player1Score.text) + 1)
 	      ball.x = display.contentCenterX
 	      ball.y = display.contentCenterY
-	      ball.isAwake = false
+	      stopBall()
 	      score = score+1
 	      return score
 	    end
@@ -1041,20 +1055,35 @@ end
 	Runtime:addEventListener("enterFrame", check)
 
 --event listeners for buttons
-	button2:addEventListener( "touch", function()
-		shoot(player1, 1, redSegmentTransition);
+	--un solo tocco genera piu' eventi (began, moved, ended): senza filtrare la
+	--fase l'azione partiva 2-3 volte, e per invert le inversioni pari si
+	--annullavano riportando il player nella direzione di partenza
+	button2:addEventListener( "touch", function( event )
+		if event.phase == "began" then
+			shoot(player1, 1, redSegmentTransition);
+		end
+		return true
 	end)
 
-	button4:addEventListener( "touch", function()
-		shoot(player2, 2, blueSegmentTransition);
+	button4:addEventListener( "touch", function( event )
+		if event.phase == "began" then
+			shoot(player2, 2, blueSegmentTransition);
+		end
+		return true
 	end)
 
-	button1:addEventListener( "touch", function()
-		invert(player1, 1, redSegmentTransition, redX, redY);
+	button1:addEventListener( "touch", function( event )
+		if event.phase == "began" then
+			invert(player1, 1, redSegmentTransition, redX, redY);
+		end
+		return true
 	end)
 
-	button3:addEventListener( "touch", function()
-		invert(player2, 2, blueSegmentTransition, blueX, blueY);
+	button3:addEventListener( "touch", function( event )
+		if event.phase == "began" then
+			invert(player2, 2, blueSegmentTransition, blueX, blueY);
+		end
+		return true
 	end)
 
 	Runtime:addEventListener( "enterFrame", function()

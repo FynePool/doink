@@ -17,7 +17,7 @@
 	global.ballType = 0
 	global.fieldType = 0
 	global.soundFlag = 0
-	global.sfxFlag = 0
+	global.sfxFlag = 1
 	global.difficulty = 2
 	--global.playerType = 0
 

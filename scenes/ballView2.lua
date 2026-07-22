@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn, ball4, ball5, leftBtn, rightBtn
+
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
@@ -41,7 +44,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 
 	--back button
-	local backBtn = widget.newButton{
+	backBtn = widget.newButton{
 		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView
@@ -50,7 +53,7 @@ function scene:create( event )
 	backBtn.y = display.contentHeight*1/100
 
 --balls
-local ball4 = widget.newButton{
+ball4 = widget.newButton{
   defaultFile= "assets/balls/ball4S.png",
   overFile="assets/balls/ball4P.png",
   width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -59,7 +62,7 @@ local ball4 = widget.newButton{
  ball4.x = display.contentWidth*25/100
  ball4.y = display.contentHeight*35/100
 
- local ball5 = widget.newButton{
+ ball5 = widget.newButton{
     defaultFile= "assets/balls/ball5S.png",
     overFile="assets/balls/ball5P.png",
     width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -69,14 +72,14 @@ local ball4 = widget.newButton{
   ball5.y = display.contentHeight*35/100
 
 --arrow buttons
-local rightBtn = widget.newButton{
+rightBtn = widget.newButton{
 	defaultFile= "assets/buttons/buttonRight.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 }
 rightBtn.x = display.contentCenterX+35
 rightBtn.y = display.contentHeight
 
-local leftBtn = widget.newButton{
+leftBtn = widget.newButton{
 	defaultFile= "assets/buttons/buttonLeft.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 	onRelease = ballView1

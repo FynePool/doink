@@ -2,7 +2,9 @@
 
 A local two-player arcade football game for mobile, built with the Corona SDK (now [Solar2D](https://solar2d.com/)) in Lua.
 
-Two players share one device in portrait orientation, sitting at opposite ends of the screen. Each defends the goal on their side, and the first to out-score the other before the timer runs out wins.
+Two players share one device in portrait orientation, sitting at opposite ends of the screen. Each defends the goal on their side and tries to out-score the other.
+
+The in-game guide describes a match timer, but none was ever implemented: a match runs until the players stop.
 
 ## Gameplay
 
@@ -29,7 +31,7 @@ Each player has two power-up slots shown at mid-field on their own side: the one
 
 - **Match** — the two-player game described above.
 - **Training** — intended for solo practice. **Currently a stub**: [trainingView.lua](scenes/trainingView.lua) only renders the background and a back button, with no gameplay wired up.
-- **Settings** ([creditsView.lua](scenes/creditsView.lua)) — difficulty (Easy / Normal / Hard), music and SFX toggles.
+- **Settings** ([creditsView.lua](scenes/creditsView.lua)) — difficulty, music and SFX toggles. Difficulty scales how fast the players slide along the border, which is what makes aiming harder: Easy 0.75×, Normal 1×, Hard 1.3×. Settings apply immediately but are not persisted.
 - **Customization** — selectable ball and pitch skins ([ballView.lua](scenes/ballView.lua), [fieldView.lua](scenes/fieldView.lua)), with assets in [balls/](assets/balls/) and [fields/](assets/fields/).
 
 An in-game guide with the full rules is in [guideView.lua](scenes/guideView.lua) (text in Italian).

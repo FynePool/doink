@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn, field0, field1, field2, field3
+
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
@@ -52,7 +55,7 @@ function scene:create( event )
 	text.x = display.contentWidth*55/100
   text.y = display.contentHeight*1/100
 
-  local field0 = widget.newButton{
+  field0 = widget.newButton{
   	defaultFile= "assets/fields/field0.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView0
@@ -60,7 +63,7 @@ function scene:create( event )
   field0.x = display.contentWidth*25/100
   field0.y = display.contentHeight*32/100
 
-  local field1 = widget.newButton{
+  field1 = widget.newButton{
   	defaultFile= "assets/fields/field1v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView1
@@ -68,7 +71,7 @@ function scene:create( event )
   field1.x = display.contentWidth*75/100
   field1.y = display.contentHeight*32/100
 
-  local field2 = widget.newButton{
+  field2 = widget.newButton{
   	defaultFile= "assets/fields/field2v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
   	onRelease = creditsView2
@@ -76,7 +79,7 @@ function scene:create( event )
   field2.x = display.contentWidth*25/100
   field2.y = display.contentHeight*82/100
 
-  local field3 = widget.newButton{
+  field3 = widget.newButton{
   	defaultFile= "assets/fields/field3v.png",
   	width = display.contentWidth*40/100, height = display.contentWidth*71/100,
     onRelease = creditsView3
@@ -85,7 +88,7 @@ function scene:create( event )
   field3.y = display.contentHeight*82/100
 
   --back button
-  local backBtn = widget.newButton{
+  backBtn = widget.newButton{
   	defaultFile= "assets/buttons/back_round.png",
   	width = display.contentWidth*20/100, height = display.contentWidth*20/100,
   	onRelease = creditsView

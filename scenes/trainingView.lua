@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn
+
 -- include Corona's "widget" library
 local widget = require "widget"
 
@@ -24,7 +27,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 
 --buttons
-	local backBtn = widget.newButton{
+	backBtn = widget.newButton{
 		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView

@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn, ballBtn, bugBtn, difficultyControl, fieldBtn, guideBtn, musicSwitch, sfxSwitch
+
 -- include Corona's "widget" library
 local widget = require "widget"
 
@@ -29,30 +32,29 @@ local function ballView()
 	return true
 end
 local function bug()
-	system.openURL( "https://it.surveymonkey.com/r/KHY83LL" )
+	system.openURL( "https://github.com/FynePool/doink/issues" )
 	return true
 end
 
 -----------------------------------------------------------------------------------------
 --> Switch FUNCTIONS
 
+--audio.play restituisce il canale su cui sta suonando: va conservato, perche'
+--e' l'unico modo per fermare quel loop. Senza, ogni riaccensione ne avviava
+--uno nuovo sopra il precedente e lo spegnimento non aveva effetto.
 function playSound()
   if ( global.soundFlag==1 ) then
-    global.sound = audio.loadSound("assets/sounds/mainSound.wav")
-		audio.play(global.sound, {loops=-1})
+    if not global.sound then
+      global.sound = audio.loadSound("assets/sounds/mainSound.wav")
+    end
+    if not global.musicChannel then
+      global.musicChannel = audio.play(global.sound, {loops=-1})
+    end
   elseif ( global.soundFlag==0 ) then
-    global.sound = audio.loadSound("assets/sounds/mainSound.wav")
-    audio.pause(global.sound)
-  end
-end
-
-function playSfx()
-  if ( global.sfxFlag==1 ) then
-    --global.sound = audio.loadSound("assets/sounds/mainSound.wav")
-		--audio.play(global.sound, {loops=-1})
-  elseif ( global.fxFlag==0 ) then
-    --global.sound = audio.loadSound("assets/sounds/mainSound.wav")
-    --audio.pause(global.sound)
+    if global.musicChannel then
+      audio.stop(global.musicChannel)
+      global.musicChannel = nil
+    end
   end
 end
 
@@ -139,7 +141,7 @@ function scene:create( event )
 			sheetContentHeight = 128
 	}
 	local difficultySheet = graphics.newImageSheet( "assets/widgets/SegmentedControlBlue.png", optionsDiff )
-	local difficultyControl = widget.newSegmentedControl({
+	difficultyControl = widget.newSegmentedControl({
 	        left = display.contentWidth*36.5/100,
 	        top = display.contentHeight*5/100,
 	        segmentWidth = 60,
@@ -184,7 +186,7 @@ function scene:create( event )
 	    sheetContentHeight = 88
 	}
 	local musicSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
-	local musicSwitch = widget.newSwitch(
+	musicSwitch = widget.newSwitch(
 	    {
 	        x = musicX(),
 	        y = display.contentHeight*28/100,
@@ -215,13 +217,12 @@ function scene:create( event )
 	local function sfxPress( event )
 	    local switch = event.target
 	    print( "Switch '"..switch.id.."' is on: "..tostring(switch.isOn) )
-			if ( global.sfx == 0) then
-				global.sfx = 1
+			if ( global.sfxFlag == 0) then
+				global.sfxFlag = 1
 			else
-				global.sfx = 0
+				global.sfxFlag = 0
 			end
-			print("Sfx: ", global.sfx)
-			playSfx()
+			print("Sfx: ", global.sfxFlag)
 	end
 	local options = {
 			    frames = {
@@ -234,7 +235,7 @@ function scene:create( event )
 	    sheetContentHeight = 88
 	}
 	local sfxSwitchSheet = graphics.newImageSheet( "assets/widgets/switchSheetSquare.png", options )
-	local sfxSwitch = widget.newSwitch(
+	sfxSwitch = widget.newSwitch(
 	    {
 					x = sfxX(),
 	        y = display.contentHeight*28/100,
@@ -289,7 +290,7 @@ function scene:create( event )
 -----------------------------------------------------------------------------------------
 --buttons
 --back button
-local backBtn = widget.newButton{
+backBtn = widget.newButton{
 	defaultFile= "assets/buttons/back_round.png",
 	width = display.contentWidth*18/100, height = display.contentWidth*18/100,
 	onRelease = menuView
@@ -298,7 +299,7 @@ backBtn.x = display.contentWidth*10/100
 backBtn.y = display.contentHeight*1/100-15
 
 --guide button
-local guideBtn = widget.newButton{
+guideBtn = widget.newButton{
 	defaultFile= "assets/buttons/button.png",
 	overFile= "assets/buttons/button-over.png",
 	label= "Guida",
@@ -310,7 +311,7 @@ guideBtn.x = display.contentCenterX
 guideBtn.y = display.contentHeight*45/100
 
 --balls button
-local ballBtn = widget.newButton{
+ballBtn = widget.newButton{
 	defaultFile= "assets/buttons/ballView.png",
 	width = display.contentWidth*30/100, height = display.contentWidth*30/100,
 	onRelease = ballView
@@ -319,7 +320,7 @@ ballBtn.x = display.contentCenterX-65
 ballBtn.y = display.contentHeight*65/100
 
 --fields button
-local fieldBtn = widget.newButton{
+fieldBtn = widget.newButton{
 	defaultFile= "assets/buttons/fieldView.png",
 	width = display.contentWidth*28.125/100, height = display.contentWidth*25/100,
 	onRelease = fieldView
@@ -328,7 +329,7 @@ fieldBtn.x = display.contentCenterX+65
 fieldBtn.y = display.contentHeight*65/100
 
 --bugs button
-local bugBtn = widget.newButton{
+bugBtn = widget.newButton{
 	defaultFile= "assets/buttons/bugBtn.png",
 	width = display.contentWidth*90/100, height = display.contentWidth*21/100,
 	onRelease = bug

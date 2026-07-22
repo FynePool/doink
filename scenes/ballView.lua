@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn, ball0, ball1, ball2, ball3, leftBtn, rightBtn
+
 -- include Corona's "widget" library
 local widget = require "widget"
 -- include global variables custom lua
@@ -51,7 +54,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 
 	--back button
-	local backBtn = widget.newButton{
+	backBtn = widget.newButton{
 		defaultFile= "assets/buttons/back_round.png",
 		width = display.contentWidth*20/100, height = display.contentWidth*20/100,
 		onRelease = menuView
@@ -60,7 +63,7 @@ function scene:create( event )
 	backBtn.y = display.contentHeight*1/100
 
 --balls
-local ball0 = widget.newButton{
+ball0 = widget.newButton{
 	defaultFile= "assets/balls/ball0S.png",
 	overFile="assets/balls/ball0P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -69,7 +72,7 @@ local ball0 = widget.newButton{
 ball0.x = display.contentWidth*25/100
 ball0.y = display.contentHeight*35/100
 
-local ball1 = widget.newButton{
+ball1 = widget.newButton{
 	defaultFile= "assets/balls/ball1S.png",
 	overFile="assets/balls/ball1P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -78,7 +81,7 @@ local ball1 = widget.newButton{
 ball1.x = display.contentWidth*75/100
 ball1.y = display.contentHeight*35/100
 
-local ball2 = widget.newButton{
+ball2 = widget.newButton{
 	defaultFile= "assets/balls/ball2S.png",
 	overFile="assets/balls/ball2P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -87,7 +90,7 @@ local ball2 = widget.newButton{
 ball2.x = display.contentWidth*25/100
 ball2.y = display.contentHeight*70/100
 
-local ball3 = widget.newButton{
+ball3 = widget.newButton{
 	defaultFile= "assets/balls/ball3S.png",
 	overFile="assets/balls/ball3P.png",
 	width = display.contentWidth*40/100, height = display.contentWidth*40/100,
@@ -97,7 +100,7 @@ ball3.x = display.contentWidth*75/100
 ball3.y = display.contentHeight*70/100
 
 --arrow buttons
-local rightBtn = widget.newButton{
+rightBtn = widget.newButton{
 	defaultFile= "assets/buttons/buttonRight.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 	onRelease = ballView2
@@ -105,7 +108,7 @@ local rightBtn = widget.newButton{
 rightBtn.x = display.contentCenterX+35
 rightBtn.y = display.contentHeight
 
-local leftBtn = widget.newButton{
+leftBtn = widget.newButton{
 	defaultFile= "assets/buttons/buttonLeft.png",
 	width = display.contentWidth*15/100, height = display.contentWidth*15/100,
 }

@@ -5,6 +5,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
+--dichiarati qui e non dentro create: scene:destroy deve poterli vedere
+local backBtn
+
 -- include Corona's "widget" library
 local widget = require "widget"
 
@@ -77,7 +80,7 @@ scrollView:insert( guideText01 )
 -----------------------------------------------------------------------------------------
 --> BUTTONS
 --back button
-local backBtn = widget.newButton{
+backBtn = widget.newButton{
 	defaultFile= "assets/buttons/back_round.png",
 	width = display.contentWidth*18/100, height = display.contentWidth*18/100,
 	onRelease = creditsView
