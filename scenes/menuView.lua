@@ -6,7 +6,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 --dichiarati qui e non dentro create: scene:destroy deve poterli vedere
-local crdBtn, playBtn
+local crdBtn, playBtn, trnBtn
 
 -- include Corona's "widget" library
 local widget = require "widget"
@@ -53,14 +53,14 @@ function scene:create( event )
 	playBtn.y = display.contentHeight*46.5/100
 
 	--training button
-	--[[local trnBtn = widget.newButton{
+	trnBtn = widget.newButton{
 		defaultFile="assets/buttons/transparent.png",
 		width= display.contentWidth*48/100,
 		height= display.contentHeight*10/100,
 		onRelease = trainingView
 	}
 	trnBtn.x = display.contentWidth*67/100
-	trnBtn.y = display.contentHeight*76/100]]
+	trnBtn.y = display.contentHeight*76/100
 
 --credits button
 	crdBtn = widget.newButton{
@@ -76,7 +76,7 @@ function scene:create( event )
 	sceneGroup:insert( background )
 	sceneGroup:insert( playBtn )
 	sceneGroup:insert( crdBtn )
-	--sceneGroup:insert ( trnBtn )
+	sceneGroup:insert( trnBtn )
 end
 
 -----------------------------------------------------------------------------------------
@@ -87,8 +87,8 @@ function scene:destroy( event )
 	playBtn = nil
 	crdBtn:removeSelf()
 	crdBtn = nil
-	--trnBtn:removeSelf()
-	--trnBtn = nil
+	trnBtn:removeSelf()
+	trnBtn = nil
 end
 
 -----------------------------------------------------------------------------------------

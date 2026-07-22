@@ -864,11 +864,18 @@ if global.gameMode == 2 then
 
 	local function onLocalCollision(object, event)
 		if ( event.phase == "began" ) then
-			audio.play(cheers, {channel=5})
+			if global.sfxFlag == 1 then
+				audio.play(cheers, {channel=5})
+			end
 		elseif ( event.phase == "ended" ) then
-			object:removeSelf()
+			--il bersaglio non puo' essere distrutto qui: Box2D sta ancora
+			--risolvendo la collisione. Si rimanda al frame successivo.
+			timer.performWithDelay(1, function()
+				display.remove(object)
+			end)
 			targetCounter = targetCounter + 1
 			if targetCounter == 3 then
+				targetCounter = 0
 				trainingStage = trainingStage + 1
 				targetSpawner()
 			end

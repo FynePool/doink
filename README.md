@@ -32,7 +32,7 @@ Each player has two power-up slots shown at mid-field on their own side: the one
 Both modes run inside [gameView.lua](scenes/gameView.lua), switched by `global.gameMode`:
 
 - **Match** (`gameMode = 1`) — the two-player game described above, with a pause overlay and an end-of-match popup.
-- **Training** (`gameMode = 2`) — solo practice: targets spawn on the pitch in waves of three, with a cheer when you hit one. **Implemented but currently unreachable** — the menu button that sets `gameMode = 2` is commented out in [menuView.lua](scenes/menuView.lua), so there is no way into it from the UI.
+- **Training** (`gameMode = 2`) — solo practice. Note that the ball is not involved: in training it is created with no physics body and hidden, and player 2 is hidden and stationary. The targets carry the ball's collision filter, whose mask includes the players, so you shoot *yourself* at them. Three targets spawn, each answering with a cheer; clearing all three returns to the menu. The staging is scaffolded (`trainingStage`) but only one wave is implemented.
 - **Settings** ([creditsView.lua](scenes/creditsView.lua)) — music and SFX toggles. The difficulty selector is commented out and `global.difficulty` is not read anywhere, so difficulty currently has no effect. Settings apply immediately but are not persisted.
 - **Customization** — selectable ball and pitch skins ([ballView.lua](scenes/ballView.lua), [fieldView.lua](scenes/fieldView.lua)), with assets in [balls/](assets/balls/) and [fields/](assets/fields/). The pitch choice also drives the UI theme: power-up icons and the menu, restart and back buttons come in neon, black and white variants selected from `global.fieldType`.
 
@@ -117,5 +117,6 @@ font and the GGData save helper — were unused and have been removed.
 ## Status
 
 Started in 2017, with a substantial round of work in 2021 that added training
-mode, the themed UI, the pause overlay and the five-goal win condition. Published
-as-is; not actively developed.
+mode, the themed UI, the pause overlay and the five-goal win condition. That
+build shipped with training disabled behind a "coming soon" label; it was
+finished and switched on in v6.1.0.

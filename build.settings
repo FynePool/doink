@@ -64,7 +64,7 @@ settings =
 		-- Repository files that are not game assets. Without this they are
 		-- copied into the app bundle and shipped to users: the design PDF and
 		-- the debug notes alone are about 1.4 MB.
-		all = { "docs/*", "README.md", "LICENSE", ".gitignore", ".claude/*", },
+		all = { "docs/*", "README.md", "CLAUDE.md", "LICENSE", ".gitignore", ".claude/*", },
 		-- Exclude unnecessary files for each platform
 		ios = { "Icon.png", "Icon-*dpi.png", },
 		android = { "Icon.png", "Icon-??.png", "Icon-???.png", "LaunchScreen.storyboardc", },
