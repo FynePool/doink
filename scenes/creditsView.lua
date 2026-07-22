@@ -45,7 +45,7 @@ end
 function playSound()
   if ( global.soundFlag==1 ) then
     if not global.sound then
-      global.sound = audio.loadSound("assets/sounds/mainSound.wav")
+      global.sound = audio.loadStream("assets/sounds/mainSound.mp3")
     end
     if not global.musicChannel then
       global.musicChannel = audio.play(global.sound, {loops=-1})

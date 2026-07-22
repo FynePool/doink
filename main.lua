@@ -6,7 +6,9 @@
 -- include global variables custom lua
 	local global = require( "lib.variables" )
 --load sound file to prevent delay when activated or disabled
-	global.sound = audio.loadSound("assets/sounds/mainSound.wav")
+--loadStream e non loadSound: il brano dura oltre 4 minuti e loadSound lo
+--terrebbe interamente decompresso in memoria
+	global.sound = audio.loadStream("assets/sounds/mainSound.mp3")
 --> HIDE ANDROID SYSTEM UI
 	native.setProperty( "androidSystemUiVisibility", "immersiveSticky" )
 

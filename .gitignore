@@ -10,6 +10,7 @@ Icon*
 
 # Build output
 *.apk
+*.aab
 *.ipa
 build/
 
