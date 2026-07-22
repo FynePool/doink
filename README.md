@@ -1,5 +1,7 @@
 # Doink!
 
+![Doink! — two players, one phone, first to five goals](docs/preview.jpg)
+
 A local two-player arcade football game for mobile, built with the Corona SDK (now [Solar2D](https://solar2d.com/)) in Lua.
 
 Two players share one device in portrait orientation, sitting at opposite ends of the screen. Each defends the goal on their side. **First to five goals wins.**
